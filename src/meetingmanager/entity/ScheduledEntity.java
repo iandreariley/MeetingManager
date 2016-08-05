@@ -9,6 +9,10 @@ public abstract class ScheduledEntity {
 	protected ScheduledEntity() {
 		schedule = new TreeSet<TimeSlot>();
 	}
+	
+	public void setSchedule(TreeSet<TimeSlot> schedule) {
+		this.schedule = schedule;
+	}
 
 	public TreeSet<TimeSlot> getSchedule() {
 		return schedule;
@@ -19,8 +23,8 @@ public abstract class ScheduledEntity {
 		TimeSlot before = schedule.floor(slot);
 		
 		return
-				(after == null || !slot.overlaps(after)) &&
-				(before == null || !slot.overlaps(before));
+			(after == null || !slot.overlaps(after)) &&
+			(before == null || !slot.overlaps(before));
 	}
 
 	public boolean addEvent(TimeSlot slot) {

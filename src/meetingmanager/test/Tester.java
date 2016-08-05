@@ -1,11 +1,13 @@
 package meetingmanager.test;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.ScheduledEntity;
 import meetingmanager.entity.TimeSlot;
 import meetingmanager.model.DatabaseConnection;
+import meetingmanager.model.EmployeeDatabase;
 
 public class Tester {
 	
@@ -34,18 +36,16 @@ public class Tester {
 	private static void runDBTest() {
 		try {
 			DatabaseConnection.registerSQLDriver();
-		} catch(Exception e) {
-			System.err.println("Couldn't load driver");
-		}
-		
-		try {
-			DatabaseConnection manager = new DatabaseConnection(){};
+			DatabaseConnection manager = new EmployeeDatabase();
 			manager.connect();
-		} catch(Exception e) {
+			System.out.println("hooray! database connection established!");
+		} catch(ClassNotFoundException e) {
+			System.err.println("Couldn't load driver");
+		} catch(SQLException e) {
 			System.err.println("Couldn't connect to database");
+			e.printStackTrace();
 		}
 		
-		System.out.println("hooray! database connection established!");
 	}
 
 	private static void runTimeSlotTest() {

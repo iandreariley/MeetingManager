@@ -4,6 +4,7 @@ public class Employee extends ScheduledEntity {
 	
 	private String name;
 	private String loginId;
+	private String password;
 	private boolean isAdmin;
 	
 	public String getName() {
@@ -32,9 +33,13 @@ public class Employee extends ScheduledEntity {
 		this.isAdmin = isAdmin;
 		return this;
 	}
+
+	public Employee setPassword(String password) {
+		this.password = password;
+		return this;
+	}
 	
-	public boolean isVisible(TimeSlot slot, boolean visible) {
-		//TODO
-		return true;
+	public String getPassword() {
+		return password;
 	}
 }
