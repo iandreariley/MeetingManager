@@ -7,7 +7,7 @@ import java.util.List;
 import meetingmanager.entity.TimeSlot;
 import meetingmanager.exception.MissingPrimaryKeyException;
 
-public class RoomScheduleDatabase extends DatabaseConnection<TimeSlot> {
+public class RoomScheduleDatabase extends TimeSlotDatabase {
 
 	public RoomScheduleDatabase() throws SQLException {
 		super();

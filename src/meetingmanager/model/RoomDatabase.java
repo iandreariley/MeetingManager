@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import meetingmanager.entity.Room;
+import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.MissingPrimaryKeyException;
 
 public class RoomDatabase extends DatabaseConnection<Room> {
@@ -42,6 +43,16 @@ public class RoomDatabase extends DatabaseConnection<Room> {
 	public void deleteRoom(Room room) throws SQLException, MissingPrimaryKeyException {
 		checkPrimaryKey(room);
 		updateDatabase("DELETE FROM room WHERE " + keyValue(LOCATION, room.getLocation()));
+	}
+	
+	public Room getRoom(String location) throws SQLException, EntityNotFoundException {
+		List<Room> results = queryDatabase("SELECT * FROM room WHERE " + keyValue(LOCATION, location));
+		checkResultsNotEmpty(results);
+		return results.get(0);
+	}
+	
+	public List<Room> getAllRooms() throws SQLException, EntityNotFoundException {
+		return queryDatabase("SELECT * FROM room");
 	}
 
 	@Override
