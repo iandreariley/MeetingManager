@@ -11,6 +11,11 @@ import meetingmanager.exception.MissingPrimaryKeyException;
 import meetingmanager.model.DatabaseConnection;
 import meetingmanager.model.EmployeeDatabase;
 
+
+import javax.swing.SwingUtilities;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.BorderFactory;
 public class Tester {
 	
 	private static TimeSlot timeslot1;
@@ -22,6 +27,13 @@ public class Tester {
 		runTimeSlotTest();
 		runScheduleTest();
 		runDBTest();
+                
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                createAndShowGUI();
+            }
+        });
+                
 	}
 	
 	private static void runScheduleTest() {
@@ -113,4 +125,17 @@ public class Tester {
 		c.set(calendarField, value);
 		return c;
 	}
+        
+        
+        
+        private static void createAndShowGUI() {
+        System.out.println("Created GUI on EDT? "+
+        SwingUtilities.isEventDispatchThread());
+        JFrame f = new JFrame("Basic JFrame");
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.add(new AdminPage());                        //test page
+        f.pack();
+        f.setVisible(true);
+        f.setLocationRelativeTo(null);
+    }
 }
