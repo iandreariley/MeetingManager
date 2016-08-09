@@ -15,7 +15,7 @@ public abstract class DatabaseConnection<T> {
 	public static final String USER = "test";
 	public static final String DATABASE = "test";
 	public static final String HOST = "localhost";
-	public static final String SETTINGS = "&allowMultiQueries=true";
+	public static final String SETTINGS = "&allowMultiQueries=true&useSSL=false";
 	protected static final String LINE_SEP = ", ";
 	
 	public static final void registerSQLDriver() throws ClassNotFoundException {
