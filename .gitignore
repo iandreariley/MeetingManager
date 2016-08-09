@@ -7,3 +7,5 @@ bin/*
 
 # classpath
 .classpath
+/nbproject/private/
+/build/
