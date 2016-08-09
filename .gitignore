@@ -5,5 +5,8 @@ bin/*
 .settings/*
 .project
 
-# classpath
+# build files
 .classpath
+nbproject/*
+build.xml
+build/*
