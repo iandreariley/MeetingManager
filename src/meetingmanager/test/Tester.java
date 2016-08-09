@@ -131,9 +131,9 @@ public class Tester {
         private static void createAndShowGUI() {
         System.out.println("Created GUI on EDT? "+
         SwingUtilities.isEventDispatchThread());
-        JFrame f = new JFrame("Basic JFrame");
+        JFrame f = new JFrame("Scheduler");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(new AdminPage());                        //test page
+        f.add(new Login());                        //test page
         f.pack();
         f.setVisible(true);
         f.setLocationRelativeTo(null);
