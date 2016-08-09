@@ -42,8 +42,7 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 	
 	public Employee getEmployee(String loginId) throws SQLException, EntityNotFoundException {
 		List<Employee> results = queryDatabase("SELECT * FROM employee WHERE " + keyValue(LOGIN_ID, loginId));
-		if(results.size() < 1)
-			throw new EntityNotFoundException();
+		checkResultsNotEmpty(results);
 		return results.get(0);
 	}
 	

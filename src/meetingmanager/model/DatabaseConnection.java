@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.MissingPrimaryKeyException;
 
 public abstract class DatabaseConnection<T> {
@@ -64,5 +65,10 @@ public abstract class DatabaseConnection<T> {
 	
 	protected String stringify(String value) {
 		return "'" + value + "'";
+	}
+	
+	protected void checkResultsNotEmpty(List<T> results) throws EntityNotFoundException {
+		if(results.isEmpty())
+			throw new EntityNotFoundException();
 	}
 }
