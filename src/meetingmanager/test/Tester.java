@@ -6,6 +6,8 @@ import java.util.Calendar;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.ScheduledEntity;
 import meetingmanager.entity.TimeSlot;
+import meetingmanager.exception.EntityNotFoundException;
+import meetingmanager.exception.MissingPrimaryKeyException;
 import meetingmanager.model.DatabaseConnection;
 import meetingmanager.model.EmployeeDatabase;
 
@@ -16,7 +18,6 @@ public class Tester {
 	private static TimeSlot timeslot3;
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		createTestTimeSlots();
 		runTimeSlotTest();
 		runScheduleTest();
@@ -36,14 +37,39 @@ public class Tester {
 	private static void runDBTest() {
 		try {
 			DatabaseConnection.registerSQLDriver();
-			DatabaseConnection manager = new EmployeeDatabase();
-			manager.connect();
+			EmployeeDatabase manager = new EmployeeDatabase();
 			System.out.println("hooray! database connection established!");
+			
+			Employee emp = new Employee()
+				.setLoginId("testEmp")
+				.isAdmin(false)
+				.setName("testman")
+				.setPassword("pass");
+			
+			manager.addEmployee(emp);
+			
+			System.out.println("Employee Added!");
+			
+			emp.setName("testOther");
+			manager.updateEmployee(emp);
+			
+			System.out.println("Employee Updated!");
+			
+			manager.getEmployee(emp.getLoginId());
+			
+			System.out.println("Employee Retrieved!");
+			
+			manager.deleteEmployee(emp);
+			
+			System.out.println("Employee Deleted");
 		} catch(ClassNotFoundException e) {
 			System.err.println("Couldn't load driver");
 		} catch(SQLException e) {
-			System.err.println("Couldn't connect to database");
 			e.printStackTrace();
+		} catch(MissingPrimaryKeyException e) {
+			System.err.println(e.getMessage());
+		} catch (EntityNotFoundException e) {
+			System.err.println(e.getMessage());
 		}
 		
 	}

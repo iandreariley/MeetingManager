@@ -5,8 +5,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
+
+import meetingmanager.exception.MissingPrimaryKeyException;
 
 public abstract class DatabaseConnection<T> {
 
@@ -14,23 +15,31 @@ public abstract class DatabaseConnection<T> {
 	public static final String USER = "test";
 	public static final String DATABASE = "test";
 	public static final String HOST = "localhost";
+	public static final String SETTINGS = "&allowMultiQueries=true";
+	protected static final String LINE_SEP = ", ";
 	
 	public static final void registerSQLDriver() throws ClassNotFoundException {
 		Class.forName(MYSQL_DRIVER);
 	}
 	
-	public static Connection connect() throws SQLException {
-		return DriverManager.getConnection("jdbc:mysql://" + HOST + "/" + DATABASE + "?user=" + USER);
+	public DatabaseConnection() throws SQLException {
+		init();
 	}
 	
-	public void updateDatabase(String modStatement) throws SQLException {
+	protected abstract void init() throws SQLException;
+	
+	protected static Connection connect() throws SQLException {
+		return DriverManager.getConnection("jdbc:mysql://" + HOST + "/" + DATABASE + "?user=" + USER + SETTINGS);
+	}
+	
+	protected void updateDatabase(String modStatement) throws SQLException {
 		Connection connection = connect();
 		Statement statement = connection.createStatement();
 		statement.executeUpdate(modStatement);
 		connection.close();
 	}
 	
-	public List<T> queryDatabase(String queryStatement) throws SQLException {
+	protected List<T> queryDatabase(String queryStatement) throws SQLException {
 		Connection connection = connect();
 		Statement statement = connection.createStatement();
 		ResultSet rs = statement.executeQuery(queryStatement);
@@ -38,4 +47,22 @@ public abstract class DatabaseConnection<T> {
 	}
 	
 	protected abstract List<T> toObject(ResultSet rs) throws SQLException;
+	
+	protected abstract void checkPrimaryKey(T obj) throws MissingPrimaryKeyException;
+	
+	protected String keyValue(String key, String value) {
+		return key + "=" + stringify(value);
+	}
+	
+	protected String keyValue(String key, Boolean value) {
+		return key + "=" + value.toString();
+	}
+	
+	protected String keyValue(String key, Integer value) {
+		return key + "=" + value.toString();
+	}
+	
+	protected String stringify(String value) {
+		return "'" + value + "'";
+	}
 }

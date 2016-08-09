@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import meetingmanager.entity.Employee;
+import meetingmanager.exception.EntityNotFoundException;
+import meetingmanager.exception.MissingPrimaryKeyException;
 
 public class EmployeeDatabase extends DatabaseConnection<Employee> {
 	
@@ -15,7 +17,7 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 	public static final String IS_ADMIN = "is_admin";
 	
 	public EmployeeDatabase() throws SQLException {
-		init();
+		super();
 	}
 	
 	public void init() throws SQLException {
@@ -30,10 +32,34 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 
 	public void addEmployee(Employee employee) throws SQLException {
 		updateDatabase(
-			"INSERT INTO employee VALUES ('" +
-			employee.getLoginId() + "', '" + 
-			employee.getName() +"', " +
-			employee.isAdmin()
+			"INSERT INTO employee VALUES (" +
+			stringify(employee.getLoginId()) + LINE_SEP + 
+			stringify(employee.getName()) +LINE_SEP +
+			stringify(employee.getPassword()) + LINE_SEP +
+			employee.isAdmin() + ")"
+		);
+	}
+	
+	public Employee getEmployee(String loginId) throws SQLException, EntityNotFoundException {
+		List<Employee> results = queryDatabase("SELECT * FROM employee WHERE " + keyValue(LOGIN_ID, loginId));
+		if(results.size() < 1)
+			throw new EntityNotFoundException();
+		return results.get(0);
+	}
+	
+	public void deleteEmployee(Employee employee) throws SQLException, MissingPrimaryKeyException {
+		checkPrimaryKey(employee);
+		updateDatabase("DELETE FROM employee WHERE login_id='" + employee.getLoginId() + "'");
+	}
+	
+	public void updateEmployee(Employee employee) throws SQLException, MissingPrimaryKeyException {
+		checkPrimaryKey(employee);
+		updateDatabase(
+			"UPDATE employee SET " +
+			keyValue(NAME, employee.getName()) + LINE_SEP +
+			keyValue(PASSWORD, employee.getPassword()) + LINE_SEP +
+			keyValue(IS_ADMIN, employee.isAdmin()) + " " +
+			"WHERE " + keyValue(LOGIN_ID, employee.getLoginId())
 		);
 	}
 	
@@ -50,5 +76,11 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 		}
 		
 		return results;
+	}
+
+	@Override
+	protected void checkPrimaryKey(Employee employee) throws MissingPrimaryKeyException {
+		if(employee.getLoginId() == null || employee.getLoginId().length() < 1)
+			throw new MissingPrimaryKeyException();
 	}
 }
