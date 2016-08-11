@@ -10,12 +10,14 @@ import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.MissingPrimaryKeyException;
 import meetingmanager.model.DatabaseConnection;
 import meetingmanager.model.EmployeeDatabase;
+import meetingmanager.model.RoomDatabase;
 
 
 import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.BorderFactory;
+import meetingmanager.entity.Room;
 public class Tester {
 	
 	private static TimeSlot timeslot1;
@@ -50,14 +52,13 @@ public class Tester {
 		try {
 			DatabaseConnection.registerSQLDriver();
 			EmployeeDatabase manager = new EmployeeDatabase();
+                        RoomDatabase roomManager = new RoomDatabase();
+                        
 			System.out.println("hooray! database connection established!");
 			
-			Employee emp = new Employee()
-				.setLoginId("testEmp")
-				.isAdmin(false)
-				.setName("testman")
-				.setPassword("pass");
-			
+                        Employee emp = testEmp();
+                        Employee emp2 = testEmp();
+                        Room room = testRoom();
 			manager.addEmployee(emp);
 			
 			System.out.println("Employee Added!");
@@ -85,6 +86,28 @@ public class Tester {
 		}
 		
 	}
+        
+        private static Employee testEmp() {
+            return new Employee()
+                        .setLoginId("testEmp")
+			.isAdmin(false)
+			.setName("testman")
+			.setPassword("pass");
+        }
+        
+        private static Employee testEmp2() {
+            return new Employee()
+                        .setLoginId("testEmp2")
+                        .isAdmin(true)
+                        .setName("testotherman")
+                        .setPassword("pass");
+        }
+        
+        private static Room testRoom() {
+            return new Room()
+                    .setLocation("test")
+                    .setCapacity(10);
+        }
 
 	private static void runTimeSlotTest() {
 		testOverlap(timeslot1, timeslot2, true);
