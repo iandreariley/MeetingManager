@@ -19,14 +19,22 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
         public static final String OWNER = "owner";
         public static final String CONFIRMED = "confirmed";
         public static final String IS_UPDATE = "is_update";
-    
-        private final RoomDatabase roomDatabase;
-        private final EmployeeDatabase employeeDatabase;
+        private static MeetingDatabase instance;
+        
+        static {
+            try {
+                instance = new MeetingDatabase();
+            } catch(SQLException e) {
+                System.err.println("Uh Oh! Meeting Database failed initialization!");
+            }
+        }
+        
+        public static MeetingDatabase getInstance() {
+            return instance;
+        }
 
-	public MeetingDatabase() throws SQLException {
+	private MeetingDatabase() throws SQLException {
 		super();
-                roomDatabase = new RoomDatabase();
-                employeeDatabase = new EmployeeDatabase();
 	}
 
 	@Override
@@ -48,11 +56,20 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
         
         public void addMeeting(Meeting meeting) throws SQLException {
             updateDatabase(
-                "INSERT INTO TABLE meeting ( "
+                "INSERT INTO meeting ( "
                 + stringify(meeting.getOwner().getLoginId()) + LINE_SEP
                 + stringify(meeting.getStartTime().toString()) + LINE_SEP
                 + stringify(meeting.getEndTime().toString()) + LINE_SEP
                 + stringify(meeting.getLocation().getLocation()) + ")"
+            );
+        }
+        
+        public void deleteMeeting(Meeting meeting) throws SQLException {
+            updateDatabase(
+               "DELETE FROM meeting WHERE ( "
+               + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
+               + keyValue(START_TIME, meeting.getStartTime()) + AND
+               + keyValue(END_TIME, meeting.getEndTime())
             );
         }
         
@@ -111,8 +128,8 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
             try {
                 while(rs.next()) {
                     Meeting next = new Meeting()
-                        .setLocation(roomDatabase.getRoom(rs.getString(LOCATION)))
-                        .setOwner(employeeDatabase.getEmployee(rs.getString(OWNER)));
+                        .setLocation(RoomDatabase.getInstance().getRoom(rs.getString(LOCATION)))
+                        .setOwner(EmployeeDatabase.getInstance().getEmployee(rs.getString(OWNER)));
                     next.setStartTime(rs.getDate(START_TIME));
                     next.setEndTime(rs.getDate(END_TIME));
                     results.add(next);

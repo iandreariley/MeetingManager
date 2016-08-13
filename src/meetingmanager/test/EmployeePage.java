@@ -8,6 +8,7 @@ package meetingmanager.test;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import meetingmanager.entity.Employee;
 
 /**
  *
@@ -20,6 +21,10 @@ public class EmployeePage extends javax.swing.JPanel {
      */
     public EmployeePage() {
         initComponents();
+    }
+
+    public EmployeePage(Employee employee) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**

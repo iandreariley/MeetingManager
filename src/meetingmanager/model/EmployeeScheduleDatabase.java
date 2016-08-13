@@ -13,8 +13,21 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
     public static final String EMPLOYEE = "employee_id";
     public static final String START_TIME = "startTime";
     public static final String END_TIME = "endTime";
+    private static EmployeeScheduleDatabase instance;
+
+    static {
+        try {
+            instance = new EmployeeScheduleDatabase();
+        } catch(SQLException e) {
+            System.err.println("Uh Oh! EmployeeScheduleDatabase failed initialization!");
+        }
+    }
+
+    public static EmployeeScheduleDatabase getInstance() {
+        return instance;
+    }
             
-	public EmployeeScheduleDatabase() throws SQLException {
+	private EmployeeScheduleDatabase() throws SQLException {
 		super();
 	}
 

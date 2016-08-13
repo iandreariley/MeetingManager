@@ -21,12 +21,22 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
     public static final String OWNER = "owner";
     public static final String CONFIRMED = "confirmed";
     public static final String IS_UPDATE = "is_update";
-    
-    EmployeeDatabase employeeDatabase;
+    private static InvitationStatusDatabase instance;
+        
+    static {
+        try {
+            instance = new InvitationStatusDatabase();
+        } catch(SQLException e) {
+            System.err.println("Uh Oh! InvitationStatusDatabase failed initialization!");
+        }
+    }
 
-    public InvitationStatusDatabase() throws SQLException {
+    public static InvitationStatusDatabase getInstance() {
+        return instance;
+    }
+
+    private InvitationStatusDatabase() throws SQLException {
         super();
-        employeeDatabase = new EmployeeDatabase();
     }
     
     @Override
@@ -66,6 +76,18 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
         );
     }
     
+    public void updateInvitationStatus(Employee employee, Meeting meeting, boolean isAttending) throws SQLException {
+        updateDatabase(
+            "UPDATE invitation_status SET "
+            + keyValue(CONFIRMED, isAttending) + 
+            "WHERE "
+            + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
+            + keyValue(START_TIME, meeting.getStartTime()) + AND
+            + keyValue(END_TIME, meeting.getEndTime()) + AND
+            + keyValue(INVITEE, employee.getLoginId())
+        );
+    }
+    
     public void deleteInvitationTime(Meeting meeting, Employee invitee) throws SQLException {
         updateDatabase(
             "DELETE FROM invitation_status WHERE "
@@ -96,7 +118,7 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
 
     @Override
     protected List<Employee> toObject(ResultSet rs) throws SQLException {
-        return employeeDatabase.toObject(rs);
+        return EmployeeDatabase.getInstance().toObject(rs);
     }
 
     @Override

@@ -22,6 +22,19 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
     
     private static final String RECIPIENT = "recipient";
     private static final String MESSAGE = "message";
+    private static NotificationDatabase instance;
+
+    static {
+        try {
+            instance = new NotificationDatabase();
+        } catch(SQLException e) {
+            System.err.println("Uh Oh! Notification Database failed initialization!");
+        }
+    }
+
+    public static NotificationDatabase getInstance() {
+        return instance;
+    }
     
     public NotificationDatabase() throws SQLException {
         super();
@@ -68,7 +81,7 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
             while(rs.next()) {
                 Notification result = new Notification(
                     rs.getString(MESSAGE),
-                    new EmployeeDatabase().getEmployee(rs.getString(RECIPIENT))
+                    EmployeeDatabase.getInstance().getEmployee(rs.getString(RECIPIENT))
                 );
             }
         } catch(EntityNotFoundException e) {

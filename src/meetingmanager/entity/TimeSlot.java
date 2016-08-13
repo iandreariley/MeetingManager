@@ -12,6 +12,13 @@ public class TimeSlot implements Comparable<TimeSlot> {
 	public TimeSlot() {
 		isVisible = true;
 	}
+        
+        public TimeSlot(TimeSlot other) {
+            this.startTime = other.startTime;
+            this.endTime = other.endTime;
+            this.isVisible = other.isVisible;
+            this.title = other.title;
+        }
 
 	public boolean overlaps(TimeSlot other) {
 		if (overlaps(this, other) || overlaps(other, this))
@@ -55,16 +62,28 @@ public class TimeSlot implements Comparable<TimeSlot> {
 		return this;
 	}
 
-	public boolean isVisible() {
+	public final boolean isVisible() {
 		return isVisible;
 	}
 
-	public TimeSlot isVisible(boolean isVisible) {
+	public final TimeSlot isVisible(boolean isVisible) {
 		this.isVisible = isVisible;
 		return this;
 	}
 	
+        @Override
 	public int compareTo(TimeSlot other) {
 		return other.startTime.compareTo(this.startTime);
 	}
+        
+        @Override
+        public boolean equals(Object other) {
+            if(other == null) return false;
+            if(other == this) return true;
+            if(!(other instanceof TimeSlot)) return false;
+            
+            TimeSlot otherTimeSlot = (TimeSlot) other;
+            return otherTimeSlot.endTime.equals(this.endTime) &&
+                   otherTimeSlot.startTime.equals(this.startTime);
+        }
 }

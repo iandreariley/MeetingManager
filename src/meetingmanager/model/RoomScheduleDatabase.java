@@ -13,8 +13,21 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
     public static final String ROOM = "location";
     public static final String START_TIME = "startTime";
     public static final String END_TIME = "endTime";
+    private static RoomScheduleDatabase instance;
 
-    public RoomScheduleDatabase() throws SQLException {
+    static {
+        try {
+            instance = new RoomScheduleDatabase();
+        } catch(SQLException e) {
+            System.err.println("Uh Oh! RoomScheduleDatabase failed initialization!");
+        }
+    }
+
+    public static RoomScheduleDatabase getInstance() {
+        return instance;
+    }
+
+    private RoomScheduleDatabase() throws SQLException {
         super();
     }
 
@@ -47,6 +60,13 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
             + keyValue(ROOM, room.getLocation()) + AND
             + keyValue(START_TIME, item.getStartTime()) + AND
             + keyValue(END_TIME, item.getEndTime()) + AND
+        );
+    }
+    
+    public List<TimeSlot> getRoomSchedule(Room room) throws SQLException {
+        return queryDatabase(
+            "SELECT * FROM WHERE "
+            + keyValue(ROOM, room.getLocation())
         );
     }
 

@@ -15,8 +15,21 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 	public static final String NAME = "name";
 	public static final String PASSWORD = "password";
 	public static final String IS_ADMIN = "is_admin";
+        private static EmployeeDatabase instance;
+        
+        static {
+            try {
+                instance = new EmployeeDatabase();
+            } catch(SQLException e) {
+                System.err.println("Uh Oh! Employee Database failed initialization!");
+            }
+        }
+        
+        public static EmployeeDatabase getInstance() {
+            return instance;
+        }
 	
-	public EmployeeDatabase() throws SQLException {
+	private EmployeeDatabase() throws SQLException {
 		super();
 	}
 	
@@ -51,14 +64,14 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 		updateDatabase("DELETE FROM employee WHERE login_id='" + employee.getLoginId() + "'");
 	}
 	
-	public void updateEmployee(Employee employee) throws SQLException, MissingPrimaryKeyException {
-		checkPrimaryKey(employee);
+	public void updateEmployee(String loginId, Employee employee) throws SQLException {
 		updateDatabase(
-			"UPDATE employee SET " +
-			keyValue(NAME, employee.getName()) + LINE_SEP +
-			keyValue(PASSWORD, employee.getPassword()) + LINE_SEP +
-			keyValue(IS_ADMIN, employee.isAdmin()) + " " +
-			"WHERE " + keyValue(LOGIN_ID, employee.getLoginId())
+                    "UPDATE employee SET " +
+                    keyValue(LOGIN_ID, employee.getLoginId()) + LINE_SEP +
+                    keyValue(NAME, employee.getName()) + LINE_SEP +
+                    keyValue(PASSWORD, employee.getPassword()) + LINE_SEP +
+                    keyValue(IS_ADMIN, employee.isAdmin()) + " " +
+                    "WHERE " + keyValue(LOGIN_ID, loginId)
 		);
 	}
 	

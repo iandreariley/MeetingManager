@@ -13,8 +13,21 @@ public class RoomDatabase extends DatabaseConnection<Room> {
 	
 	public static final String LOCATION = "location";
 	public static final String CAPACITY = "capacity";
+        private static RoomDatabase instance;
+        
+        static {
+            try {
+                instance = new RoomDatabase();
+            } catch(SQLException e) {
+                System.err.println("Uh Oh! Room Database failed initialization!");
+            }
+        }
+        
+        public static RoomDatabase getInstance() {
+            return instance;
+        }
 	
-	public RoomDatabase() throws SQLException {
+	private RoomDatabase() throws SQLException {
 		super();
 	}
 
@@ -51,7 +64,7 @@ public class RoomDatabase extends DatabaseConnection<Room> {
 		return results.get(0);
 	}
 	
-	public List<Room> getAllRooms() throws SQLException, EntityNotFoundException {
+	public List<Room> getAllRooms() throws SQLException {
 		return queryDatabase("SELECT * FROM room");
 	}
 

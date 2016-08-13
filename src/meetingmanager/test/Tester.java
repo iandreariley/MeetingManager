@@ -51,8 +51,8 @@ public class Tester {
 	private static void runDBTest() {
 		try {
 			DatabaseConnection.registerSQLDriver();
-			EmployeeDatabase manager = new EmployeeDatabase();
-                        RoomDatabase roomManager = new RoomDatabase();
+			EmployeeDatabase manager = EmployeeDatabase.getInstance();
+                        RoomDatabase roomManager = RoomDatabase.getInstance();
                         
 			System.out.println("hooray! database connection established!");
 			
@@ -64,7 +64,7 @@ public class Tester {
 			System.out.println("Employee Added!");
 			
 			emp.setName("testOther");
-			manager.updateEmployee(emp);
+			manager.updateEmployee(emp.getLoginId(), emp);
 			
 			System.out.println("Employee Updated!");
 			
