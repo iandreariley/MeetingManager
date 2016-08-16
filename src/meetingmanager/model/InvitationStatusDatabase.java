@@ -42,14 +42,19 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
     @Override
     protected void init() throws SQLException {
         updateDatabase (
-            "CREATE TABLE IF NOT EXISTS invitation_status VALUES ( "
-            + "owner VARCHAR(50), "
-            + "startTime DATE, "
-            + "endTime DATE, "
-            + "invitee VARCHAR(50), "
-            + "confirmed BOOL, "
-            + "is_update BOOL NOT NULL, "
-            + "PRIMARY KEY (owner, startTime, endTime, invitee))"
+            "CREATE TABLE IF NOT EXISTS invitation_status ("
+            + " owner VARCHAR(50),"
+            + " startTime DATETIME,"
+            + " endTime DATETIME,"
+            + " invitee VARCHAR(50),"
+            + " confirmed BOOL,"
+            + " is_update BOOL,"
+            + " FOREIGN KEY (owner, startTime, endTime)"
+            + " REFERENCES meeting(owner, startTime, endTime)"
+            + " ON DELETE CASCADE ON UPDATE CASCADE,"
+            + " FOREIGN KEY (invitee) REFERENCES employee(login_id)"
+            + " ON DELETE CASCADE ON UPDATE CASCADE,"
+            + " PRIMARY KEY (owner, startTime, endTime, invitee))"
         );
     }
     

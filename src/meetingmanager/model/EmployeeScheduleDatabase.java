@@ -2,6 +2,7 @@ package meetingmanager.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import meetingmanager.entity.Employee;
 
@@ -50,8 +51,9 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
                 "INSERT INTO employee_schedule_line VALUES ( "
                 + stringify(employee.getLoginId()) + LINE_SEP
                 + stringify(item.getTitle()) + LINE_SEP
-                + stringify(item.getStartTime()) + LINE_SEP
-                + stringify(item.getEndTime()) + ")"
+                + stringify(item.getSQLFormattedStartTime()) + LINE_SEP
+                + stringify(item.getSQLFormattedEndTime()) + LINE_SEP
+                + item.isVisible() + ")"
             );
         }
         
@@ -59,8 +61,8 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
             updateDatabase(
                 "DELETE FROM employee_schedule_line WHERE "
                 + keyValue(EMPLOYEE, employee.getLoginId()) + AND
-                + keyValue(START_TIME, item.getStartTime()) + AND
-                + keyValue(END_TIME, item.getEndTime()) + AND
+                + keyValue(START_TIME, item.getSQLFormattedStartTime()) + AND
+                + keyValue(END_TIME, item.getSQLFormattedEndTime())
             );
         }
 
@@ -76,5 +78,19 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
 		// TODO Auto-generated method stub
 		
 	}
+        
+        @Override
+        public List<TimeSlot> toObject(ResultSet rs) throws SQLException{
+            List<TimeSlot> results = new ArrayList<>();
+            while(rs.next()) {
+                TimeSlot result = new TimeSlot()
+                    .setTitle(rs.getString("title"))
+                    .setStartTime(rs.getDate("startTime"))
+                    .setEndTime(rs.getDate("endTime"))
+                    .isVisible(rs.getBoolean("visible"));
+                results.add(result);
+            }
+            return results;
+        }
 
 }

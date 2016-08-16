@@ -1,9 +1,12 @@
 package meetingmanager.entity;
 
 import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class TimeSlot implements Comparable<TimeSlot> {
 
+        private static final SimpleDateFormat SQL_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
 	private String title;
 	private Date startTime;
 	private Date endTime;
@@ -52,6 +55,10 @@ public class TimeSlot implements Comparable<TimeSlot> {
 		this.startTime = startTime;
 		return this;
 	}
+        
+        public String getSQLFormattedStartTime() {
+            return convertDateToSQLFormattedDatetimeString(startTime);
+        }
 
 	public Date getEndTime() {
 		return endTime;
@@ -61,6 +68,10 @@ public class TimeSlot implements Comparable<TimeSlot> {
 		this.endTime = endTime;
 		return this;
 	}
+        
+        public String getSQLFormattedEndTime() {
+            return convertDateToSQLFormattedDatetimeString(endTime);
+        }
 
 	public final boolean isVisible() {
 		return isVisible;
@@ -85,5 +96,14 @@ public class TimeSlot implements Comparable<TimeSlot> {
             TimeSlot otherTimeSlot = (TimeSlot) other;
             return otherTimeSlot.endTime.equals(this.endTime) &&
                    otherTimeSlot.startTime.equals(this.startTime);
+        }
+        
+        @Override
+        public String toString() {
+            return title + " " + startTime + " to " + endTime;
+        }
+        
+        private String convertDateToSQLFormattedDatetimeString(Date date) {
+            return SQL_FORMAT.format(date);
         }
 }

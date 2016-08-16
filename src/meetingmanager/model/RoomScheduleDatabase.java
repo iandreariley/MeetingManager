@@ -2,6 +2,7 @@ package meetingmanager.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import meetingmanager.entity.Room;
 
@@ -49,8 +50,8 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
             "INSERT INTO room_schedule_line VALUES ( "
             + stringify(room.getLocation()) + LINE_SEP
             + stringify(item.getTitle()) + LINE_SEP
-            + stringify(item.getStartTime()) + LINE_SEP
-            + stringify(item.getEndTime()) + ")"
+            + stringify(item.getSQLFormattedStartTime()) + LINE_SEP
+            + stringify(item.getSQLFormattedEndTime()) + ")"
         );
     }
 
@@ -58,14 +59,14 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
         updateDatabase(
             "DELETE FROM room_schedule_line WHERE "
             + keyValue(ROOM, room.getLocation()) + AND
-            + keyValue(START_TIME, item.getStartTime()) + AND
-            + keyValue(END_TIME, item.getEndTime()) + AND
+            + keyValue(START_TIME, item.getSQLFormattedStartTime()) + AND
+            + keyValue(END_TIME, item.getSQLFormattedEndTime())
         );
     }
     
     public List<TimeSlot> getRoomSchedule(Room room) throws SQLException {
         return queryDatabase(
-            "SELECT * FROM WHERE "
+            "SELECT * FROM room_schedule_line WHERE "
             + keyValue(ROOM, room.getLocation())
         );
     }
@@ -75,6 +76,20 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
                     throws MissingPrimaryKeyException {
             // TODO Auto-generated method stub
 
+    }
+        
+    @Override
+    public List<TimeSlot> toObject(ResultSet rs) throws SQLException{
+        List<TimeSlot> results = new ArrayList<>();
+        while(rs.next()) {
+            TimeSlot result = new TimeSlot()
+                .setTitle(rs.getString("title"))
+                .setStartTime(rs.getDate("startTime"))
+                .setEndTime(rs.getDate("endTime"))
+                .isVisible(true);
+            results.add(result);
+        }
+        return results;
     }
 
 }
