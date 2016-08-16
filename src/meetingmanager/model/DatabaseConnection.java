@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Date;
 
 import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.MissingPrimaryKeyException;
@@ -18,6 +19,7 @@ public abstract class DatabaseConnection<T> {
 	public static final String HOST = "localhost";
 	public static final String SETTINGS = "&allowMultiQueries=true&useSSL=false";
 	protected static final String LINE_SEP = ", ";
+        protected static final String AND = " AND ";
 	
 	public static final void registerSQLDriver() throws ClassNotFoundException {
 		Class.forName(MYSQL_DRIVER);
@@ -52,19 +54,27 @@ public abstract class DatabaseConnection<T> {
 	protected abstract void checkPrimaryKey(T obj) throws MissingPrimaryKeyException;
 	
 	protected String keyValue(String key, String value) {
-		return key + "=" + stringify(value);
+            return key + "=" + stringify(value);
 	}
 	
 	protected String keyValue(String key, Boolean value) {
-		return key + "=" + value.toString();
+            return key + "=" + value.toString();
 	}
 	
 	protected String keyValue(String key, Integer value) {
-		return key + "=" + value.toString();
+            return key + "=" + value.toString();
 	}
+        
+        protected String keyValue(String key, Date date) {
+            return key + "=" + date.getTime();
+        }
 	
+        protected String stringify(Date date) {
+            return stringify(date.toString());
+        }
+        
 	protected String stringify(String value) {
-		return "'" + value + "'";
+            return "'" + value + "'";
 	}
 	
 	protected void checkResultsNotEmpty(List<T> results) throws EntityNotFoundException {

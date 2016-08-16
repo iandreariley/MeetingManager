@@ -8,6 +8,7 @@ package userinterface;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import meetingmanager.entity.Employee;
 
 import meetingmanager.entity.Employee;
 /**
@@ -28,6 +29,10 @@ public class EmployeePage extends javax.swing.JPanel {
     }
     
     
+
+    public EmployeePage(Employee employee) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

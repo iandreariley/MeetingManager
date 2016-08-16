@@ -15,6 +15,11 @@ public class Meeting extends TimeSlot {
 		super();
 	}
 	
+        public Meeting(TimeSlot timeSlot) {
+            super(timeSlot);
+            this.isVisible(true);
+        }
+        
 	public void invite(Employee invitee) {
 		if(!invitee.equals(owner))
 			invited.add(invitee);
