@@ -56,8 +56,17 @@ public class TimeSlot implements Comparable<TimeSlot> {
 		return this;
 	}
         
+        public TimeSlot setStartTime(long startTime) {
+            this.startTime = new Date(startTime);
+            return this;
+        }
+        
         public String getSQLFormattedStartTime() {
             return convertDateToSQLFormattedDatetimeString(startTime);
+        }
+        
+        public long getStartTimeStamp() {
+            return startTime.getTime();
         }
 
 	public Date getEndTime() {
@@ -69,8 +78,17 @@ public class TimeSlot implements Comparable<TimeSlot> {
 		return this;
 	}
         
+        public TimeSlot setEndTime(long endTime) {
+            this.endTime = new Date(endTime);
+            return this;
+        }
+        
         public String getSQLFormattedEndTime() {
             return convertDateToSQLFormattedDatetimeString(endTime);
+        }
+        
+        public long getEndTimeStamp() {
+            return endTime.getTime();
         }
 
 	public final boolean isVisible() {

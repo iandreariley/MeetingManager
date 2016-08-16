@@ -21,6 +21,7 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
             instance = new RoomScheduleDatabase();
         } catch(SQLException e) {
             System.err.println("Uh Oh! RoomScheduleDatabase failed initialization!");
+            e.printStackTrace();
         }
     }
 
@@ -38,8 +39,8 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
             "CREATE TABLE IF NOT EXISTS room_schedule_line("
             + "location VARCHAR(100),"
             + "title VARCHAR(200),"
-            + "startTime DATETIME,"
-            + "endTime DATETIME,"
+            + "startTime BIGINT,"
+            + "endTime BIGINT,"
             + "FOREIGN KEY (location) REFERENCES room(location) ON DELETE CASCADE ON UPDATE CASCADE,"
             + "PRIMARY KEY (location, startTime, endTime))"
         );
@@ -50,8 +51,8 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
             "INSERT INTO room_schedule_line VALUES ( "
             + stringify(room.getLocation()) + LINE_SEP
             + stringify(item.getTitle()) + LINE_SEP
-            + stringify(item.getSQLFormattedStartTime()) + LINE_SEP
-            + stringify(item.getSQLFormattedEndTime()) + ")"
+            + item.getStartTimeStamp() + LINE_SEP
+            + item.getEndTimeStamp() + ")"
         );
     }
 
@@ -59,8 +60,8 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
         updateDatabase(
             "DELETE FROM room_schedule_line WHERE "
             + keyValue(ROOM, room.getLocation()) + AND
-            + keyValue(START_TIME, item.getSQLFormattedStartTime()) + AND
-            + keyValue(END_TIME, item.getSQLFormattedEndTime())
+            + keyValue(START_TIME, item.getStartTime()) + AND
+            + keyValue(END_TIME, item.getEndTime())
         );
     }
     
@@ -84,8 +85,8 @@ public class RoomScheduleDatabase extends TimeSlotDatabase {
         while(rs.next()) {
             TimeSlot result = new TimeSlot()
                 .setTitle(rs.getString("title"))
-                .setStartTime(rs.getDate("startTime"))
-                .setEndTime(rs.getDate("endTime"))
+                .setStartTime(rs.getLong("startTime"))
+                .setEndTime(rs.getLong("endTime"))
                 .isVisible(true);
             results.add(result);
         }

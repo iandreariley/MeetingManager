@@ -42,8 +42,8 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
             updateDatabase(
                 "CREATE TABLE IF NOT EXISTS meeting ( "
                 + "owner VARCHAR(50), "
-                + "startTime DATETIME, "
-                + "endTime DATETIME, "
+                + "startTime BIGINT, "
+                + "endTime BIGINT, "
                 + "location VARCHAR(100), "
                 + "title VARCHAR(100), "
                 + "FOREIGN KEY (owner) REFERENCES employee(login_id) "
@@ -58,8 +58,8 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
             updateDatabase(
                 "INSERT INTO meeting ( "
                 + stringify(meeting.getOwner().getLoginId()) + LINE_SEP
-                + stringify(meeting.getStartTime().toString()) + LINE_SEP
-                + stringify(meeting.getEndTime().toString()) + LINE_SEP
+                + meeting.getStartTimeStamp() + LINE_SEP
+                + meeting.getEndTimeStamp() + LINE_SEP
                 + stringify(meeting.getLocation().getLocation()) + ")"
             );
         }
@@ -130,8 +130,8 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
                     Meeting next = new Meeting()
                         .setLocation(RoomDatabase.getInstance().getRoom(rs.getString(LOCATION)))
                         .setOwner(EmployeeDatabase.getInstance().getEmployee(rs.getString(OWNER)));
-                    next.setStartTime(rs.getDate(START_TIME));
-                    next.setEndTime(rs.getDate(END_TIME));
+                    next.setStartTime(rs.getLong(START_TIME));
+                    next.setEndTime(rs.getLong(END_TIME));
                     results.add(next);
                 }
 

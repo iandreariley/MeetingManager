@@ -39,8 +39,9 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
 			"CREATE TABLE IF NOT EXISTS employee_schedule_line ("
 			+ "employee_id VARCHAR(50),"
                         + "title VARCHAR(200),"
-			+ "startTime DATETIME,"
-			+ "endTime DATETIME, visible BOOL,"
+			+ "startTime BIGINT,"
+			+ "endTime BIGINT, "
+                        + "visible BOOL,"
 			+ "FOREIGN KEY (employee_id) REFERENCES employee(login_id) ON DELETE CASCADE ON UPDATE CASCADE,"
 			+ "PRIMARY KEY (employee_id, startTime, endTime)); "
 		);
@@ -51,8 +52,8 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
                 "INSERT INTO employee_schedule_line VALUES ( "
                 + stringify(employee.getLoginId()) + LINE_SEP
                 + stringify(item.getTitle()) + LINE_SEP
-                + stringify(item.getSQLFormattedStartTime()) + LINE_SEP
-                + stringify(item.getSQLFormattedEndTime()) + LINE_SEP
+                + item.getStartTimeStamp() + LINE_SEP
+                + item.getEndTimeStamp() + LINE_SEP
                 + item.isVisible() + ")"
             );
         }
@@ -61,8 +62,8 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
             updateDatabase(
                 "DELETE FROM employee_schedule_line WHERE "
                 + keyValue(EMPLOYEE, employee.getLoginId()) + AND
-                + keyValue(START_TIME, item.getSQLFormattedStartTime()) + AND
-                + keyValue(END_TIME, item.getSQLFormattedEndTime())
+                + keyValue(START_TIME, item.getStartTime()) + AND
+                + keyValue(END_TIME, item.getEndTime())
             );
         }
 
@@ -85,8 +86,8 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
             while(rs.next()) {
                 TimeSlot result = new TimeSlot()
                     .setTitle(rs.getString("title"))
-                    .setStartTime(rs.getDate("startTime"))
-                    .setEndTime(rs.getDate("endTime"))
+                    .setStartTime(rs.getLong("startTime"))
+                    .setEndTime(rs.getLong("endTime"))
                     .isVisible(rs.getBoolean("visible"));
                 results.add(result);
             }

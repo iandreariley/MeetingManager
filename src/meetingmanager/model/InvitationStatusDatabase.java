@@ -44,8 +44,8 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
         updateDatabase (
             "CREATE TABLE IF NOT EXISTS invitation_status ("
             + " owner VARCHAR(50),"
-            + " startTime DATETIME,"
-            + " endTime DATETIME,"
+            + " startTime BIGINT,"
+            + " endTime BIGINT,"
             + " invitee VARCHAR(50),"
             + " confirmed BOOL,"
             + " is_update BOOL,"
@@ -62,8 +62,8 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
         updateDatabase(
             "INSERT INTO TABLE invitation_status ( "
             + stringify(meeting.getOwner().getLoginId()) + LINE_SEP
-            + stringify(meeting.getStartTime().toString()) + LINE_SEP
-            + stringify(meeting.getEndTime().toString()) + LINE_SEP
+            + meeting.getStartTimeStamp() + LINE_SEP
+            + meeting.getEndTimeStamp() + LINE_SEP
             + stringify(invitee.getLoginId()) + LINE_SEP
             + "NULL)"
         );

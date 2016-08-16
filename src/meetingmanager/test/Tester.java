@@ -41,8 +41,8 @@ public class Tester {
 		runScheduleTest();
 		runDBTest();
                 runAdminControlTest();
-                //runEmployeeControlTest();
-                //runMeetingControlTest();
+                runEmployeeControlTest();
+                runMeetingControlTest();
                 
 //        SwingUtilities.invokeLater(new Runnable(){
 //            public void run(){
@@ -160,23 +160,23 @@ public class Tester {
                 e.printStackTrace();
             }
             
-//            try {
-//                AdminControl.DeleteRoomEvent(testRoom, timeslot1);
-//                sysout("Room event deleted!");
-//            } catch(SQLException e) {
-//                syserr("SQLException while trying to delete room event as admin.");
-//                e.printStackTrace();
-//            }
-//            
-//            try {
-//                AdminControl.deleteRoom(testRoom);
-//                sysout("Deleted Room as Admin!");
-//            } catch(SQLException e) {
-//                syserr("SQLException while trying to delete room as admin.");
-//                e.printStackTrace();
-//            } catch(MissingPrimaryKeyException e) {
-//                syserr("Some how couldn't find that room we added earlier.");
-//            }
+            try {
+                AdminControl.DeleteRoomEvent(testRoom, timeslot1);
+                sysout("Room event deleted!");
+            } catch(SQLException e) {
+                syserr("SQLException while trying to delete room event as admin.");
+                e.printStackTrace();
+            }
+            
+            try {
+                AdminControl.deleteRoom(testRoom);
+                sysout("Deleted Room as Admin!");
+            } catch(SQLException e) {
+                syserr("SQLException while trying to delete room as admin.");
+                e.printStackTrace();
+            } catch(MissingPrimaryKeyException e) {
+                syserr("Some how couldn't find that room we added earlier.");
+            }
         }
         
         private static void runEmployeeControlTest() {

@@ -66,7 +66,7 @@ public abstract class DatabaseConnection<T> {
 	}
         
         protected String keyValue(String key, Date date) {
-            return key + "=" + stringify(date);
+            return key + "=" + date.getTime();
         }
 	
         protected String stringify(Date date) {
