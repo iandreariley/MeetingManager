@@ -102,7 +102,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
 	
         @Override
 	public int compareTo(TimeSlot other) {
-		return other.startTime.compareTo(this.startTime);
+		return this.startTime.compareTo(other.startTime);
 	}
         
         @Override
