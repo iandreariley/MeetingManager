@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package meetingmanager.test;
+package userinterface;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import meetingmanager.entity.Employee;
+import meetingmanager.entity.LoginCredentials;
 /**
  *
  * @author Matthew
@@ -19,8 +21,10 @@ public class Login extends javax.swing.JPanel {
      */
     
     int isAdmin = 0;
+    Employee empl = new Employee();
     
     public Login() {
+        
         initComponents();
     }
 
@@ -121,12 +125,12 @@ public class Login extends javax.swing.JPanel {
         
         if(isAdmin == 0){
             JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-            topFrame.add(new EmployeePage());
+            topFrame.add(new EmployeePage(empl));
             Login.this.setVisible(false);
         }
         else if(isAdmin == 1){
             JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-            topFrame.add(new AdminPage());
+            topFrame.add(new AdminPage(empl));
             Login.this.setVisible(false);
         }
     }//GEN-LAST:event_jButton1ActionPerformed

@@ -3,22 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package meetingmanager.test;
+package userinterface;
 
 import javax.swing.JOptionPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import meetingmanager.entity.Employee;
 /**
  *
  * @author Matthew
  */
 public class AdminPage extends javax.swing.JPanel {
 
+    Employee admin = new Employee();
     /**
      * Creates new form AdminPage
      */
-    public AdminPage() {
+    public AdminPage(Employee admin) {
         initComponents();
     }
 
