@@ -230,6 +230,7 @@ public class Tester {
                 addRoom(room);
                 
                 AdminControl.addRoomEvent(room, event(HOUR_IN_MILLISECONDS));
+                EmployeeControl.addEvent(invitee, event(HOUR_IN_MILLISECONDS, HOUR_IN_MILLISECONDS));
                 
                 Map<Room, SortedSet<TimeSlot>> times = MeetingControl.getCoincidingTimes(1, invitee, invitee2);
                 
