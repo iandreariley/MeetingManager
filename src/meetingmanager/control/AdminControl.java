@@ -1,6 +1,7 @@
 package meetingmanager.control;
 
 import java.sql.SQLException;
+import java.util.List;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
@@ -42,5 +43,9 @@ public class AdminControl {
     
     public static void DeleteRoomEvent(Room room, TimeSlot event) throws SQLException {
         RoomScheduleDatabase.getInstance().deleteRoomScheduleItem(room, event);
+    }
+    
+    public static List<Employee> getAllEmployees() throws SQLException {
+        return EmployeeDatabase.getInstance().getAllEmployees();
     }
 }

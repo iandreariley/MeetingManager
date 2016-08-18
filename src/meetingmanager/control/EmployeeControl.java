@@ -75,4 +75,8 @@ public class EmployeeControl {
     public static EmployeePage getInterface(Employee employee) {
         return new EmployeePage(employee);
     }
+    
+    public static List<Employee> getAllEmployees() throws SQLException {
+        return EmployeeDatabase.getInstance().getAllEmployees();
+    }
 }
