@@ -5,11 +5,9 @@
  */
 package userinterface;
 
-<<<<<<< HEAD:src/meetingmanager/test/Login.java
+
 import java.sql.SQLException;
-=======
 import userinterface.EmployeePage;
->>>>>>> upstream/master:src/meetingmanager/userinterface/Login.java
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -27,7 +25,7 @@ public class Login extends javax.swing.JPanel {
      * Creates new form Login
      */
     
-    int isAdmin = 0;
+    boolean isAdmin;
     Employee empl = new Employee();
     
     public Login() {
@@ -121,10 +119,7 @@ public class Login extends javax.swing.JPanel {
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
         // TODO add your handling code here:
-        if(isAdmin == 0)
-            isAdmin = 1;
-        else
-            isAdmin = 0;
+        isAdmin = jCheckBox1.isSelected();
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -148,12 +143,12 @@ public class Login extends javax.swing.JPanel {
         
         
         
-            if(isAdmin == 0){
+            if(isAdmin == false){
                 JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
                 topFrame.add(new EmployeePage(empl));
                 Login.this.setVisible(false);
             }
-            else if(isAdmin == 1){
+            else if(isAdmin == true){
                 JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
                 topFrame.add(new AdminPage(empl));
                 Login.this.setVisible(false);
