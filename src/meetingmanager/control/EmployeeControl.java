@@ -7,10 +7,14 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import meetingmanager.entity.Employee;
+import meetingmanager.entity.Notification;
 import meetingmanager.entity.TimeSlot;
+import meetingmanager.entity.Meeting;
 import meetingmanager.model.EmployeeDatabase;
 import meetingmanager.model.EmployeeScheduleDatabase;
-import meetingmanager.test.EmployeePage;
+import meetingmanager.model.MeetingDatabase;
+import meetingmanager.model.NotificationDatabase;
+import userinterface.EmployeePage;
 import static meetingmanager.utils.Utils.*;
 
 public class EmployeeControl {
@@ -53,6 +57,19 @@ public class EmployeeControl {
         }
         
         return partialSchedule;
+    }
+    
+    public static List<Meeting> getInvitedMeetings(Employee employee) throws SQLException {
+        return MeetingDatabase.getInstance().getUnconfirmedMeetings(employee);
+    }
+    
+    public static List<Notification> getNotifications(Employee employee) throws SQLException {
+        return NotificationDatabase.getInstance().getNotifications(employee);
+    }
+    
+    
+    public static void deleteNotification(Notification notification) throws SQLException {
+        NotificationDatabase.getInstance().deleteNotification(notification);
     }
     
     public static EmployeePage getInterface(Employee employee) {

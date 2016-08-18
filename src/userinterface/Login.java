@@ -3,9 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package meetingmanager.test;
+package userinterface;
 
+<<<<<<< HEAD:src/meetingmanager/test/Login.java
 import java.sql.SQLException;
+=======
+import userinterface.EmployeePage;
+>>>>>>> upstream/master:src/meetingmanager/userinterface/Login.java
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
