@@ -28,8 +28,4 @@ public class Notification {
     public String getMessage() {
         return message;
     }
-    
-    public void erase() throws SQLException {
-        new NotificationDatabase().deleteNotification(this);
-    }
 }
