@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import meetingmanager.entity.Employee;
 import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.model.EmployeeDatabase;
-import meetingmanager.test.EmployeePage;
+import meetingmanager.userinterface.EmployeePage;
 
 public class LoginControl {
     

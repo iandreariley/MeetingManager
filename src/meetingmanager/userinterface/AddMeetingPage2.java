@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package meetingmanager.test;
+package meetingmanager.userinterface;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
