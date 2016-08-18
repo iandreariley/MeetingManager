@@ -3,13 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package userinterface;
+package meetingmanager.test;
 
+import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.LoginCredentials;
+import meetingmanager.control.LoginControl;
+import meetingmanager.exception.EntityNotFoundException;
 /**
  *
  * @author Matthew
@@ -122,17 +125,36 @@ public class Login extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        int loginValid = 0;
+        char[] passChar;
+        String user, pass;
+        LoginControl lc = new LoginControl();
         
-        if(isAdmin == 0){
-            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-            topFrame.add(new EmployeePage(empl));
-            Login.this.setVisible(false);
+        user = jTextField1.getText();
+        passChar = jPasswordField1.getPassword();
+        pass = String.copyValueOf(passChar);
+        try{
+            lc.validate(user, pass);
+            
+        }catch (SQLException e){
+            
+        }catch(EntityNotFoundException e){
+            
         }
-        else if(isAdmin == 1){
-            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-            topFrame.add(new AdminPage(empl));
-            Login.this.setVisible(false);
-        }
+        
+        
+        
+            if(isAdmin == 0){
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
+                topFrame.add(new EmployeePage(empl));
+                Login.this.setVisible(false);
+            }
+            else if(isAdmin == 1){
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
+                topFrame.add(new AdminPage(empl));
+                Login.this.setVisible(false);
+            }
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
 

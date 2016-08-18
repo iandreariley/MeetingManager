@@ -1,6 +1,5 @@
 package meetingmanager.test;
 
-import userinterface.Login;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
