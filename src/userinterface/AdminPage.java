@@ -5,11 +5,23 @@
  */
 package userinterface;
 
+import java.sql.SQLException;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import meetingmanager.entity.Employee;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import meetingmanager.control.AdminControl;
+import meetingmanager.entity.Employee;
+import meetingmanager.entity.Room;
+import meetingmanager.exception.MissingPrimaryKeyException;
+import meetingmanager.model.EmployeeDatabase;
+import meetingmanager.model.RoomDatabase;
+import static meetingmanager.userinterface.UIUtils.*;
+
 /**
  *
  * @author Matthew
@@ -17,11 +29,58 @@ import meetingmanager.entity.Employee;
 public class AdminPage extends javax.swing.JPanel {
 
     Employee admin = new Employee();
+
+    public int LOGIN_ID = 1;
+    public int NAME = 0;
+    public int LOCATION = 0;
+    public int CAPACITY = 1;
+    public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
+    
+    private Employee user;
+    
     /**
      * Creates new form AdminPage
      */
-    public AdminPage(Employee admin) {
+    public AdminPage() {
         initComponents();
+        loadUsers();
+    }
+    
+    public AdminPage(Employee employee) {
+        initComponents();
+        this.user = employee;
+    }
+    
+    private void loadUsers() {
+        try {
+            TableModel table = jTable1.getModel();
+            List<Employee> employees = EmployeeDatabase.getInstance().getAllEmployees();
+            
+            for(int i = 0; i < employees.size(); i++) {
+                Employee nextEmp = employees.get(i);
+                table.setValueAt(nextEmp.getName(), i, NAME);
+                table.setValueAt(nextEmp.getLoginId(), i, LOGIN_ID);
+            }
+            
+        } catch (SQLException e) {
+            showMessage(DATABASE_ERROR_MESSAGE);
+        }
+    }
+    
+    private void loadRooms() {
+        try {
+            TableModel table = jTable1.getModel();
+            List<Room> rooms = RoomDatabase.getInstance().getAllRooms();
+            
+            for(int i = 0; i < rooms.size(); i++) {
+                Room room = rooms.get(i);
+                table.setValueAt(room.getLocation(), i, LOCATION);
+                table.setValueAt(room.getCapacity(), i, CAPACITY);
+            }
+            
+        } catch (SQLException e) {
+            showMessage(DATABASE_ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -91,15 +150,23 @@ public class AdminPage extends javax.swing.JPanel {
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
             },
             new String [] {
-                "Room#", "Capacity", "Location", "Times"
+                "Location", "Capacity"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Integer.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(jTable2);
 
         jButton7.setText("Reset User Password");
@@ -196,9 +263,28 @@ public class AdminPage extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
+        // DELETE USER BUTTON
+        int row = jTable1.getSelectedRow();
+        DefaultTableModel table = (DefaultTableModel) jTable1.getModel();
+        String loginId = (String) table.getValueAt(row, LOGIN_ID);
+        Employee toRemove = new Employee().setLoginId(loginId);
+        try {
+            AdminControl.deleteEmployee(toRemove);
+            clearTable(table);
+            loadUsers();
+            JOptionPane.showMessageDialog(null, "Employee deleted.");
+        } catch (MissingPrimaryKeyException e) {
+            JOptionPane.showMessageDialog(null, "That employee does not exist in our databases. Whoops.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Something went horribly wrong with the database");
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_jButton5ActionPerformed
 
+    private void clearTable(DefaultTableModel table) {
+        table.getDataVector().removeAllElements();
+    }
+    
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         JFrame newFrame = new JFrame("Add a User");
@@ -215,7 +301,9 @@ public class AdminPage extends javax.swing.JPanel {
         AdminPage.this.setVisible(false);
     }//GEN-LAST:event_jButton4ActionPerformed
 
-
+    // jTable1 == Employee table
+    // jTable1 == Room table
+    // jButton5 == Delete User button.
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

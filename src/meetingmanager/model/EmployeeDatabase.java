@@ -58,6 +58,10 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 		checkResultsNotEmpty(results);
 		return results.get(0);
 	}
+        
+        public List<Employee> getAllEmployees() throws SQLException {
+            return queryDatabase("SELECT * FROM employee");
+        }
 	
 	public void deleteEmployee(Employee employee) throws SQLException, MissingPrimaryKeyException {
 		checkPrimaryKey(employee);
