@@ -5,6 +5,12 @@
  */
 package userinterface;
 
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import meetingmanager.control.AdminControl;
+import meetingmanager.entity.Employee;
+import meetingmanager.entity.Room;
+
 /**
  *
  * @author Matthew
@@ -54,6 +60,11 @@ public class AddUserPage extends javax.swing.JPanel {
         jCheckBox1.setText("Admin?");
 
         jButton1.setText("Create");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -106,8 +117,56 @@ public class AddUserPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
+        System.out.println("Entering JTextFieldAction...");
+        String loginId = jTextField1.getText();
+        String username = jTextField2.getText();
+        String password = String.valueOf(jPasswordField1.getPassword());
+        boolean isAdmin = jCheckBox1.isSelected();
+        
+        if(loginId.length() < 1 || password.length() < 1) {
+            JOptionPane.showMessageDialog(null, "Must enter and login and password");
+        }
+        
+        Employee newEmp = new Employee()
+                .setLoginId(loginId)
+                .setName(username)
+                .setPassword(password)
+                .isAdmin(isAdmin);
+        try {
+            AdminControl.addEmployee(newEmp);
+            JOptionPane.showMessageDialog(null, "User " + newEmp.getLoginId() + " added.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "That login id already exists!");
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+                                            
+        System.out.println("Entering JTextFieldAction...");
+        String loginId = jTextField1.getText();
+        String username = jTextField2.getText();
+        String password = String.valueOf(jPasswordField1.getPassword());
+        boolean isAdmin = jCheckBox1.isSelected();
+        
+        if(loginId.length() < 1 || password.length() < 1) {
+            JOptionPane.showMessageDialog(null, "Must enter and login and password");
+        }
+        
+        Employee newEmp = new Employee()
+                .setLoginId(loginId)
+                .setName(username)
+                .setPassword(password)
+                .isAdmin(isAdmin);
+        try {
+            AdminControl.addEmployee(newEmp);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "That login id already exists!");
+            e.printStackTrace();
+        }
+        
+        JOptionPane.showMessageDialog(null, "User " + newEmp.getLoginId() + " added.");
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
