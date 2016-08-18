@@ -9,12 +9,16 @@ package userinterface;
 import java.sql.SQLException;
 import userinterface.EmployeePage;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import java.sql.SQLException;
 
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.LoginCredentials;
 import meetingmanager.control.LoginControl;
 import meetingmanager.exception.EntityNotFoundException;
+import meetingmanager.model.EmployeeDatabase;
 /**
  *
  * @author Matthew
@@ -26,7 +30,7 @@ public class Login extends javax.swing.JPanel {
      */
     
     boolean isAdmin;
-    Employee empl = new Employee();
+    Employee emp = new Employee();
     
     public Login() {
         
@@ -123,17 +127,50 @@ public class Login extends javax.swing.JPanel {
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        // LOGIN BUTTON
         int loginValid = 0;
         char[] passChar;
-        String user, pass;
-        LoginControl lc = new LoginControl();
+        String loginId, password;
         
-        user = jTextField1.getText();
+        loginId = jTextField1.getText();
         passChar = jPasswordField1.getPassword();
-        pass = String.copyValueOf(passChar);
+        password = String.copyValueOf(passChar);
+        
         try{
-            lc.validate(user, pass);
+            Employee emp = EmployeeDatabase.getInstance().getEmployee(loginId);
+        }catch(SQLException e){      
+        }catch (EntityNotFoundException e){      
+        }
+        
+        if(loginId.length() < 1 || password.length() < 1) {
+            JOptionPane.showMessageDialog(null, "Must enter and login and password");
+        }
+        
+        
+        try{
+            JPanel empPage = LoginControl.validate(loginId, password);
+            if(empPage == null){
+                JOptionPane.showMessageDialog(null, "Problem logging in");
+            }
+            
+            else if(isAdmin == true && emp.isAdmin() == false){
+                JOptionPane.showMessageDialog(null, "Not an Admin");
+            }
+            else if(isAdmin == false){
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
+                topFrame.add(empPage);
+                Login.this.setVisible(false);
+            }
+            else if(isAdmin == true){
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
+                topFrame.add(empPage);
+                Login.this.setVisible(false);
+            }
+            
+            
+            
+            
+            
             
         }catch (SQLException e){
             
@@ -143,16 +180,7 @@ public class Login extends javax.swing.JPanel {
         
         
         
-            if(isAdmin == false){
-                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-                topFrame.add(new EmployeePage(empl));
-                Login.this.setVisible(false);
-            }
-            else if(isAdmin == true){
-                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-                topFrame.add(new AdminPage(empl));
-                Login.this.setVisible(false);
-            }
+            
         
     }//GEN-LAST:event_jButton1ActionPerformed
 

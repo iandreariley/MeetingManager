@@ -10,5 +10,5 @@ package userinterface;
  * @author Matthew
  */
 public interface UserInterface {
-    void display();
+    //void display();
 }
