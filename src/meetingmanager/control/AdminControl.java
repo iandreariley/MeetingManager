@@ -20,10 +20,6 @@ public class AdminControl {
         EmployeeDatabase.getInstance().deleteEmployee(employee);
     }
     
-    /**
-     * Precondition: Employee object has new password set.
-     * @param employee 
-     */
     public static void resetEmployeePassword(Employee employee, String pass) throws SQLException {
         employee.setPassword(pass);
         EmployeeDatabase.getInstance().updateEmployee(employee.getLoginId(), employee);
@@ -47,5 +43,9 @@ public class AdminControl {
     
     public static List<Employee> getAllEmployees() throws SQLException {
         return EmployeeDatabase.getInstance().getAllEmployees();
+    }
+    
+    public static List<Room> getAllRooms() throws SQLException {
+        return RoomDatabase.getInstance().getAllRooms();
     }
 }
