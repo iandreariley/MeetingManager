@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -39,6 +40,8 @@ public class AdminPage extends javax.swing.JPanel {
      */
     public AdminPage() {
         initComponents();
+        clearTable(jTable1);
+        clearTable(jTable2);
         loadUsers();
     }
     
@@ -49,34 +52,40 @@ public class AdminPage extends javax.swing.JPanel {
     
     private void loadUsers() {
         try {
-            TableModel table = jTable1.getModel();
             List<Employee> employees = EmployeeDatabase.getInstance().getAllEmployees();
             
             for(int i = 0; i < employees.size(); i++) {
-                Employee nextEmp = employees.get(i);
-                table.setValueAt(nextEmp.getName(), i, NAME);
-                table.setValueAt(nextEmp.getLoginId(), i, LOGIN_ID);
+                Object[] row = vectorizeEmployee(employees.get(i));
+                addRow(jTable1, row);
             }
-            
         } catch (SQLException e) {
             showMessage(DATABASE_ERROR_MESSAGE);
         }
     }
     
+    public void addUser(Employee user) {
+        addRow(jTable1, vectorizeEmployee(user));
+    }
+    
+    private Object[] vectorizeEmployee(Employee employee) {
+        return new Object[] { employee.getLoginId(), employee.getName() };
+    }
+    
     private void loadRooms() {
         try {
-            TableModel table = jTable1.getModel();
             List<Room> rooms = RoomDatabase.getInstance().getAllRooms();
             
             for(int i = 0; i < rooms.size(); i++) {
-                Room room = rooms.get(i);
-                table.setValueAt(room.getLocation(), i, LOCATION);
-                table.setValueAt(room.getCapacity(), i, CAPACITY);
+                Object[] room = vectorizeRoom(rooms.get(i));
+                addRow(jTable2, room);
             }
-            
         } catch (SQLException e) {
             showMessage(DATABASE_ERROR_MESSAGE);
         }
+    }
+    
+    private Object[] vectorizeRoom(Room room) {
+        return new Object[] { room.getLocation(), room.getCapacity() };
     }
 
     /**
@@ -99,10 +108,8 @@ public class AdminPage extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
         jButton7 = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
         jTextField3 = new javax.swing.JTextField();
         jTextField4 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
 
         jLabel1.setText("Admin Page");
 
@@ -198,20 +205,13 @@ public class AdminPage extends javax.swing.JPanel {
                                 .addComponent(jButton4))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(4, 4, 4)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(34, 34, 34)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(27, 27, 27)
-                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(33, 33, 33)))
+                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jButton1)
                             .addComponent(jButton6))))
@@ -244,11 +244,8 @@ public class AdminPage extends javax.swing.JPanel {
                         .addGap(39, 39, 39)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -260,37 +257,40 @@ public class AdminPage extends javax.swing.JPanel {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // DELETE USER BUTTON
-        int row = jTable1.getSelectedRow();
-        DefaultTableModel table = (DefaultTableModel) jTable1.getModel();
-        String loginId = (String) table.getValueAt(row, LOGIN_ID);
-        Employee toRemove = new Employee().setLoginId(loginId);
         try {
+            if (jTable1.getSelectedRow() < 0)
+                return;
+            
+            int row = jTable1.getSelectedRow();
+            String loginId = (String) jTable1.getValueAt(row, LOGIN_ID);
+            Employee toRemove = new Employee().setLoginId(loginId);
+            
             AdminControl.deleteEmployee(toRemove);
-            clearTable(table);
-            loadUsers();
-            JOptionPane.showMessageDialog(null, "Employee deleted.");
+            deleteRow(jTable1, row);
+            
+            showMessage("Employee deleted.");
         } catch (MissingPrimaryKeyException e) {
-            JOptionPane.showMessageDialog(null, "That employee does not exist in our databases. Whoops.");
+            showMessage("That employee does not exist in our databases. Whoops.");
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Something went horribly wrong with the database");
+            showMessage("Something went horribly wrong with the database");
             e.printStackTrace();
         }
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void clearTable(DefaultTableModel table) {
-        table.getDataVector().removeAllElements();
+    private void clearTable(JTable table) {
+        DefaultTableModel tableData = (DefaultTableModel) table.getModel();
+        tableData.getDataVector().removeAllElements();
     }
     
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         JFrame newFrame = new JFrame("Add a User");
-        newFrame.add(new AddUserPage());
+        newFrame.add(new AddUserPage(this));
         newFrame.pack();
         newFrame.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
         
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AdminPage.this);
         topFrame.add(new Login());
@@ -312,9 +312,7 @@ public class AdminPage extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
     // End of variables declaration//GEN-END:variables
 }

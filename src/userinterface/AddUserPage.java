@@ -17,11 +17,17 @@ import meetingmanager.entity.Room;
  */
 public class AddUserPage extends javax.swing.JPanel {
 
+    private AdminPage parent;
     /**
      * Creates new form AddUserPage
      */
     public AddUserPage() {
         initComponents();
+    }
+    
+    public AddUserPage(AdminPage parent) {
+        initComponents();
+        this.parent = parent;
     }
 
     /**
@@ -117,28 +123,7 @@ public class AddUserPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        System.out.println("Entering JTextFieldAction...");
-        String loginId = jTextField1.getText();
-        String username = jTextField2.getText();
-        String password = String.valueOf(jPasswordField1.getPassword());
-        boolean isAdmin = jCheckBox1.isSelected();
-        
-        if(loginId.length() < 1 || password.length() < 1) {
-            JOptionPane.showMessageDialog(null, "Must enter and login and password");
-        }
-        
-        Employee newEmp = new Employee()
-                .setLoginId(loginId)
-                .setName(username)
-                .setPassword(password)
-                .isAdmin(isAdmin);
-        try {
-            AdminControl.addEmployee(newEmp);
-            JOptionPane.showMessageDialog(null, "User " + newEmp.getLoginId() + " added.");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "That login id already exists!");
-            e.printStackTrace();
-        }
+      
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -160,12 +145,13 @@ public class AddUserPage extends javax.swing.JPanel {
                 .isAdmin(isAdmin);
         try {
             AdminControl.addEmployee(newEmp);
+            parent.addUser(newEmp);
+            JOptionPane.showMessageDialog(null, "User " + newEmp.getLoginId() + " added.");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "That login id already exists!");
             e.printStackTrace();
         }
         
-        JOptionPane.showMessageDialog(null, "User " + newEmp.getLoginId() + " added.");
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
