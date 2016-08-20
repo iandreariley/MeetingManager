@@ -3,12 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package meetingmanager.userinterface;
+package userinterface;
 
-import meetingmanager.userinterface.EmployeePage;
+
+import java.sql.SQLException;
+import userinterface.EmployeePage;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import java.sql.SQLException;
 
+import meetingmanager.entity.Employee;
+import meetingmanager.entity.LoginCredentials;
+import meetingmanager.control.LoginControl;
+import meetingmanager.exception.EntityNotFoundException;
+import meetingmanager.model.EmployeeDatabase;
 /**
  *
  * @author Matthew
@@ -19,9 +29,11 @@ public class Login extends javax.swing.JPanel {
      * Creates new form Login
      */
     
-    int isAdmin = 0;
+    boolean isAdmin;
+    Employee emp = new Employee();
     
     public Login() {
+        
         initComponents();
     }
 
@@ -111,25 +123,56 @@ public class Login extends javax.swing.JPanel {
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
         // TODO add your handling code here:
-        if(isAdmin == 0)
-            isAdmin = 1;
-        else
-            isAdmin = 0;
+        isAdmin = jCheckBox1.isSelected();
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        // LOGIN BUTTON
+        int loginValid = 0;
+        char[] passChar;
+        String loginId, password;
         
-        if(isAdmin == 0){
-            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-            topFrame.add(new EmployeePage());
-            Login.this.setVisible(false);
+        loginId = jTextField1.getText();
+        passChar = jPasswordField1.getPassword();
+        password = String.copyValueOf(passChar);
+
+        if(loginId.length() < 1 || password.length() < 1) {
+            JOptionPane.showMessageDialog(null, "Must enter and login and password");
         }
-        else if(isAdmin == 1){
-            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-            topFrame.add(new AdminPage());
-            Login.this.setVisible(false);
+        
+        
+        try{
+            Employee emp = EmployeeDatabase.getInstance().getEmployee(loginId);
+            
+            JPanel empPage = LoginControl.validate(loginId, password, isAdmin);
+            if(empPage == null){
+                JOptionPane.showMessageDialog(null, "Problem logging in");
+            }
+            else if(isAdmin == true && emp.isAdmin() == true){
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
+                topFrame.add(empPage);
+                Login.this.setVisible(false);
+            }
+            
+            else if(isAdmin == false){
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
+                topFrame.add(empPage);
+                Login.this.setVisible(false);
+            }
+            else if(isAdmin == true && emp.isAdmin() == false){
+                JOptionPane.showMessageDialog(null, "Not an Admin");
+            }
+                                                                        
+        }catch (SQLException e){
+            
+        }catch(EntityNotFoundException e){
+            
         }
+        
+        
+        
+            
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
 

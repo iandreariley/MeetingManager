@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package meetingmanager.userinterface;
+package userinterface;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -26,7 +26,7 @@ import static meetingmanager.userinterface.UIUtils.*;
  * @author Matthew
  */
 public class AdminPage extends javax.swing.JPanel {
-
+    
     public int LOGIN_ID = 1;
     public int NAME = 0;
     public int LOCATION = 0;

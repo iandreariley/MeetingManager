@@ -14,7 +14,7 @@ import meetingmanager.model.EmployeeDatabase;
 import meetingmanager.model.EmployeeScheduleDatabase;
 import meetingmanager.model.MeetingDatabase;
 import meetingmanager.model.NotificationDatabase;
-import meetingmanager.userinterface.EmployeePage;
+import userinterface.EmployeePage;
 import static meetingmanager.utils.Utils.*;
 
 public class EmployeeControl {
