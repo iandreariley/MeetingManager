@@ -9,10 +9,12 @@ import userinterface.AdminPage;
 import javax.swing.JPanel;
 public class LoginControl {
     
-    public static JPanel validate(String loginId, String password) throws SQLException, EntityNotFoundException {
+    public static JPanel validate(String loginId, String password, boolean admin) throws SQLException, EntityNotFoundException {
         Employee emp = EmployeeDatabase.getInstance().getEmployee(loginId);
         
         if(emp.getPassword().equals(password) && emp.isAdmin() == false)
+            return new EmployeePage(emp);
+        else if(emp.getPassword().equals(password)&& emp.isAdmin() == true && admin == false)
             return new EmployeePage(emp);
         else if(emp.getPassword().equals(password) && emp.isAdmin() == true)
             return new AdminPage(emp);

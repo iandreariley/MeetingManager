@@ -135,43 +135,34 @@ public class Login extends javax.swing.JPanel {
         loginId = jTextField1.getText();
         passChar = jPasswordField1.getPassword();
         password = String.copyValueOf(passChar);
-        
-        try{
-            Employee emp = EmployeeDatabase.getInstance().getEmployee(loginId);
-        }catch(SQLException e){      
-        }catch (EntityNotFoundException e){      
-        }
-        
+
         if(loginId.length() < 1 || password.length() < 1) {
             JOptionPane.showMessageDialog(null, "Must enter and login and password");
         }
         
         
         try{
-            JPanel empPage = LoginControl.validate(loginId, password);
+            Employee emp = EmployeeDatabase.getInstance().getEmployee(loginId);
+            
+            JPanel empPage = LoginControl.validate(loginId, password, isAdmin);
             if(empPage == null){
                 JOptionPane.showMessageDialog(null, "Problem logging in");
             }
-            
-            else if(isAdmin == true && emp.isAdmin() == false){
-                JOptionPane.showMessageDialog(null, "Not an Admin");
+            else if(isAdmin == true && emp.isAdmin() == true){
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
+                topFrame.add(empPage);
+                Login.this.setVisible(false);
             }
+            
             else if(isAdmin == false){
                 JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
                 topFrame.add(empPage);
                 Login.this.setVisible(false);
             }
-            else if(isAdmin == true){
-                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(Login.this);
-                topFrame.add(empPage);
-                Login.this.setVisible(false);
+            else if(isAdmin == true && emp.isAdmin() == false){
+                JOptionPane.showMessageDialog(null, "Not an Admin");
             }
-            
-            
-            
-            
-            
-            
+                                                                        
         }catch (SQLException e){
             
         }catch(EntityNotFoundException e){

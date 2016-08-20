@@ -5,6 +5,12 @@
  */
 package userinterface;
 
+import javax.swing.JOptionPane;
+import meetingmanager.control.EmployeeControl;
+import meetingmanager.entity.Employee;
+import meetingmanager.model.EmployeeDatabase;
+import java.sql.SQLException;
+
 /**
  *
  * @author Matthew
@@ -14,8 +20,12 @@ public class UpdateUserPage extends javax.swing.JPanel {
     /**
      * Creates new form UpdateUserPage
      */
-    public UpdateUserPage() {
+    public String loginId;
+    Employee emp = new Employee();
+    
+    public UpdateUserPage(Employee empl) {
         initComponents();
+        emp = empl;
     }
 
     /**
@@ -66,6 +76,11 @@ public class UpdateUserPage extends javax.swing.JPanel {
         jLabel5.setText("(Leave blank if no changes)");
 
         jButton1.setText("Submit");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -129,6 +144,33 @@ public class UpdateUserPage extends javax.swing.JPanel {
     private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jPasswordField1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // PRESS BUTTON TO UPDATE FILLED IN FIELDS
+        String userName = jTextField1.getText();
+        String userId = jTextField2.getText();
+        String password = String.valueOf(jPasswordField1.getPassword());
+        String oldId = emp.getLoginId();
+        
+        if(!userName.isEmpty()){
+            emp.setName(userName);
+        }
+        if(!userId.isEmpty()){
+            emp.setLoginId(userId);
+        }
+        if(!password.isEmpty()){
+            emp.setPassword(password);
+        }
+       JOptionPane.showMessageDialog(null, "Changes made!"); 
+       
+       try{
+           EmployeeControl.updateEmployee(oldId, emp);
+       }catch(SQLException e){
+           
+       }
+       
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

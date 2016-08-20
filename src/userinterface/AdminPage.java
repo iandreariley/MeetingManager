@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import meetingmanager.entity.Employee;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import meetingmanager.control.AdminControl;
@@ -21,15 +20,12 @@ import meetingmanager.exception.MissingPrimaryKeyException;
 import meetingmanager.model.EmployeeDatabase;
 import meetingmanager.model.RoomDatabase;
 import static meetingmanager.userinterface.UIUtils.*;
-
 /**
  *
  * @author Matthew
  */
 public class AdminPage extends javax.swing.JPanel {
-
-    Employee admin = new Employee();
-
+    
     public int LOGIN_ID = 1;
     public int NAME = 0;
     public int LOCATION = 0;

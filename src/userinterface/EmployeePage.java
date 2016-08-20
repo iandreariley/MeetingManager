@@ -20,12 +20,14 @@ public class EmployeePage extends javax.swing.JPanel {
     /**
      * Creates new form EmployeePage
      */
-    public EmployeePage(Employee emp) {
+    Employee emp;
+    
+    public EmployeePage(Employee empl) {
         initComponents();
         jButton9.setVisible(false);
         jButton10.setVisible(false);
         
-        
+        emp = empl;
     }
     
     
@@ -281,7 +283,7 @@ public class EmployeePage extends javax.swing.JPanel {
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
         // UPDATE USER INFORMATION PAGE
         JFrame newFrame = new JFrame("User info");
-        newFrame.add(new UpdateUserPage());
+        newFrame.add(new UpdateUserPage(emp));
         newFrame.pack();
         newFrame.setVisible(true);
     }//GEN-LAST:event_jButton11ActionPerformed
