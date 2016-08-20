@@ -22,12 +22,12 @@ public class EmployeePage extends javax.swing.JPanel {
      */
     Employee emp;
     
-    public EmployeePage(Employee empl) {
+    public EmployeePage(Employee employee) {
         initComponents();
         jButton9.setVisible(false);
         jButton10.setVisible(false);
         
-        emp = empl;
+        this.emp = employee;
     }
     
     
