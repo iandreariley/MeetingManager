@@ -17,8 +17,8 @@ import javax.swing.table.TableModel;
 import meetingmanager.control.AdminControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Room;
+import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.MissingPrimaryKeyException;
-import meetingmanager.model.EmployeeDatabase;
 import meetingmanager.model.RoomDatabase;
 import static meetingmanager.userinterface.UIUtils.*;
 /**
@@ -43,6 +43,7 @@ public class AdminPage extends javax.swing.JPanel {
         clearTable(jTable1);
         clearTable(jTable2);
         loadUsers();
+        loadRooms();
     }
     
     public AdminPage(Employee employee) {
@@ -52,7 +53,7 @@ public class AdminPage extends javax.swing.JPanel {
     
     private void loadUsers() {
         try {
-            List<Employee> employees = EmployeeDatabase.getInstance().getAllEmployees();
+            List<Employee> employees = AdminControl.getAllEmployees();
             
             for(int i = 0; i < employees.size(); i++) {
                 Object[] row = vectorizeEmployee(employees.get(i));
@@ -64,7 +65,7 @@ public class AdminPage extends javax.swing.JPanel {
     }
     
     public void addUser(Employee user) {
-        addRow(jTable1, vectorizeEmployee(user));
+            addRow(jTable1, vectorizeEmployee(user));
     }
     
     private Object[] vectorizeEmployee(Employee employee) {
@@ -114,6 +115,11 @@ public class AdminPage extends javax.swing.JPanel {
         jLabel1.setText("Admin Page");
 
         jButton1.setText("Add Room");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Add User");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -150,6 +156,11 @@ public class AdminPage extends javax.swing.JPanel {
         jScrollPane1.setViewportView(jTable1);
 
         jButton6.setText("Delete Room");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -251,8 +262,23 @@ public class AdminPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
-        String inputPass = JOptionPane.showInputDialog("Please input a new Password");
+        // RESET PASSWORD BUTTON
+        int row = jTable1.getSelectedRow();
+        if(row < 0) {
+            showMessage("Please select a user first");
+            return;
+        }
+        
+        try {
+            String inputPass = JOptionPane.showInputDialog("Please input a new Password");
+            Employee userToReset = retrieveEmployeeInfo(row);
+            AdminControl.resetEmployeePassword(userToReset, inputPass);
+            showMessage("Passowrd for " + userToReset.getLoginId() + " reset");
+        } catch(SQLException e) {
+            showMessage(DATABASE_ERROR_MESSAGE);
+        } catch(EntityNotFoundException e) {
+            showMessage("Selected Employee was not found in database!");
+        }
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -277,11 +303,6 @@ public class AdminPage extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void clearTable(JTable table) {
-        DefaultTableModel tableData = (DefaultTableModel) table.getModel();
-        tableData.getDataVector().removeAllElements();
-    }
-    
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         JFrame newFrame = new JFrame("Add a User");
@@ -297,8 +318,59 @@ public class AdminPage extends javax.swing.JPanel {
         AdminPage.this.setVisible(false);
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // ADD ROOM BUTTON
+        try {
+            String location = jTextField3.getText();
+            int capacity = Integer.parseInt(jTextField4.getText());
+
+            AdminControl.addRoom(newRoom(location, capacity));
+            addRow(jTable2, new Object[] { location, capacity });
+            showMessage("Room " + location + " added.");
+        } catch (SQLException e) {
+            showMessage("That room already exists!");
+        } catch (NumberFormatException e) {
+            showMessage("Capacity must be an integer.");
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // DELETE ROOM button.
+        try {
+            if (jTable2.getSelectedRow() < 0)
+                return;
+            
+            int row = jTable2.getSelectedRow();
+            String location = (String) jTable2.getValueAt(row, LOCATION);
+            Room toRemove = new Room().setLocation(location);
+            
+            AdminControl.deleteRoom(toRemove);
+            deleteRow(jTable2, row);
+            
+            showMessage("Room " + location + " deleted.");
+        } catch (MissingPrimaryKeyException e) {
+            showMessage("That employee does not exist in our databases. Whoops.");
+        } catch (SQLException e) {
+            showMessage("Something went horribly wrong with the database");
+            e.printStackTrace();
+        }
+        
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private Employee retrieveEmployeeInfo(int row) throws SQLException, EntityNotFoundException {
+        return AdminControl.getEmployee((String) jTable1.getValueAt(row, LOGIN_ID));
+                
+                
+    }
+    
+    private Room newRoom(String location, int capacity) {
+        return new Room()
+                .setLocation(location)
+                .setCapacity(capacity);
+    }
     // jTable1 == Employee table
     // jTable1 == Room table
+    // jButton1 == Add Room Button
     // jButton5 == Delete User button.
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

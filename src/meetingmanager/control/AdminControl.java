@@ -5,6 +5,7 @@ import java.util.List;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
+import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.MissingPrimaryKeyException;
 import meetingmanager.model.EmployeeDatabase;
 import meetingmanager.model.RoomDatabase;
@@ -48,4 +49,10 @@ public class AdminControl {
     public static List<Room> getAllRooms() throws SQLException {
         return RoomDatabase.getInstance().getAllRooms();
     }
+    
+    public static Employee getEmployee(String loginId) throws SQLException, EntityNotFoundException {
+        return EmployeeDatabase.getInstance().getEmployee(loginId);
+    }
+    
+
 }

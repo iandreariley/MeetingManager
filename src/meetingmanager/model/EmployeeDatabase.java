@@ -69,14 +69,14 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 	}
 	
 	public void updateEmployee(String loginId, Employee employee) throws SQLException {
-		updateDatabase(
-                    "UPDATE employee SET " +
-                    keyValue(LOGIN_ID, employee.getLoginId()) + LINE_SEP +
-                    keyValue(NAME, employee.getName()) + LINE_SEP +
-                    keyValue(PASSWORD, employee.getPassword()) + LINE_SEP +
-                    keyValue(IS_ADMIN, employee.isAdmin()) + " " +
-                    "WHERE " + keyValue(LOGIN_ID, loginId)
-		);
+            updateDatabase(
+                "UPDATE employee SET " +
+                keyValue(LOGIN_ID, employee.getLoginId()) + LINE_SEP +
+                keyValue(NAME, employee.getName()) + LINE_SEP +
+                keyValue(PASSWORD, employee.getPassword()) + LINE_SEP +
+                keyValue(IS_ADMIN, employee.isAdmin()) + " " +
+                "WHERE " + keyValue(LOGIN_ID, loginId)
+            );
 	}
 	
         @Override
