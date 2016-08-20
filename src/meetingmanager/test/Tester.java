@@ -37,13 +37,13 @@ public class Tester {
 	private static TimeSlot timeslot3;
 
 	public static void main(String[] args) {
-		createTestTimeSlots();
-		runTimeSlotTest();
-		runScheduleTest();
-		runDBTest();
-                runAdminControlTest();
-                runEmployeeControlTest();
-                runMeetingControlTest();
+//		createTestTimeSlots();
+//		runTimeSlotTest();
+//		runScheduleTest();
+//		runDBTest();
+//                runAdminControlTest();
+//                runEmployeeControlTest();
+//                runMeetingControlTest();
                 
         SwingUtilities.invokeLater(new Runnable(){
             public void run(){
@@ -330,7 +330,7 @@ public class Tester {
         
         private static Room testRoom() {
             return new Room()
-                    .setLocation("test")
+                    .setLocation("testLocation")
                     .setCapacity(10);
         }
 
