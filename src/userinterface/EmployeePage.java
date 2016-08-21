@@ -5,12 +5,22 @@
  */
 package userinterface;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.Date;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-
-
+import meetingmanager.control.AdminControl;
+import meetingmanager.control.EmployeeControl;
+import meetingmanager.entity.Notification;
 import meetingmanager.entity.Employee;
+import meetingmanager.entity.TimeSlot;
+import meetingmanager.exception.EntityNotFoundException;
+import meetingmanager.exception.MissingPrimaryKeyException;
+import static meetingmanager.userinterface.UIUtils.*;
 /**
  *
  * @author Matthew
@@ -20,16 +30,61 @@ public class EmployeePage extends javax.swing.JPanel {
     /**
      * Creates new form EmployeePage
      */
-    Employee emp;
+    private Employee emp;
+    public int TITLE = 0;
+    public int START = 1;
+    public int END = 2;
+    public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     
     public EmployeePage(Employee employee) {
         initComponents();
         jButton9.setVisible(false);
         jButton10.setVisible(false);
-        
+        clearTable(jTable1);
+        clearTable(jTable2);
+        clearTable(jTable3);
         this.emp = employee;
+        loadNotifications();
+        loadSchedule();
     }
     
+    private void loadNotifications() {
+        try {
+            List<Notification> notifications = EmployeeControl.getNotifications(emp);
+            
+            for(int i = 0; i < notifications.size(); i++) {
+                Object[] row = vectorizeNotification(notifications.get(i));
+                addRow(jTable2, row);
+            }
+        } catch (SQLException e) {
+            showMessage(DATABASE_ERROR_MESSAGE);
+        }
+    }
+    
+    private Object[] vectorizeNotification(Notification notification) {
+        return new Object[] { notification.getMessage() };
+    }
+    
+    private void loadSchedule() {
+        try {
+            List<TimeSlot> schedule = EmployeeControl.getEmployeeSchedule(emp);
+            
+            for(int i = 0; i < schedule.size(); i++) {
+                Object[] row = vectorizeSchedule(schedule.get(i));
+                addRow(jTable3, row);
+            }
+        } catch (SQLException e) {
+            showMessage(DATABASE_ERROR_MESSAGE);
+        }
+    }
+    
+    public void addEvent(TimeSlot event) {
+            addRow(jTable3, vectorizeSchedule(event));
+    }
+
+    private Object[] vectorizeSchedule(TimeSlot schedule) {
+        return new Object[] { schedule.getTitle(),schedule.getStartTime(),schedule.getEndTime() };
+    }
     
 /*
     public EmployeePage(Employee employee) {
@@ -143,8 +198,18 @@ public class EmployeePage extends javax.swing.JPanel {
         });
 
         jButton6.setText("Delete");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
 
         jButton7.setText("Update");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
 
         jButton8.setText("Logout");
         jButton8.addActionListener(new java.awt.event.ActionListener() {
@@ -153,7 +218,12 @@ public class EmployeePage extends javax.swing.JPanel {
             }
         });
 
-        jButton9.setText("Accept");
+        jButton9.setText("testadd");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
 
         jButton10.setText("Decline");
 
@@ -266,8 +336,8 @@ public class EmployeePage extends javax.swing.JPanel {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
-        JFrame newFrame = new JFrame("New Window");
-        newFrame.add(new AddSchedulePage());
+        JFrame newFrame = new JFrame("Add to Schedule");
+        newFrame.add(new AddSchedulePage(emp, this));
         newFrame.pack();
         newFrame.setVisible(true);
     }//GEN-LAST:event_jButton5ActionPerformed
@@ -287,6 +357,62 @@ public class EmployeePage extends javax.swing.JPanel {
         newFrame.pack();
         newFrame.setVisible(true);
     }//GEN-LAST:event_jButton11ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        // TODO add your handling code here:
+       
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // DELETE FROM SCHEDULE
+        try {
+            if (jTable3.getSelectedRow() < 0)
+                return;
+            
+            int row = jTable3.getSelectedRow();
+            
+            String title = (String) jTable3.getValueAt(row, TITLE);
+            Date start = (Date) jTable3.getValueAt(row, START);
+            Date end = (Date) jTable3.getValueAt(row, END);
+            
+            TimeSlot toRemove = new TimeSlot().setTitle(title);
+            toRemove.setStartTime(start);
+            toRemove.setEndTime(end);
+            
+            EmployeeControl.removeEvent(emp, toRemove);
+            deleteRow(jTable3, row);
+            
+            showMessage("Event deleted.");
+
+        } catch (SQLException e) {
+            showMessage("Something went horribly wrong with the database");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // OPEN UPDATE SCHEDULE WINDOW
+              
+            if (jTable3.getSelectedRow() < 0)
+                return;
+            
+            int row = jTable3.getSelectedRow();
+            
+            String title = (String) jTable3.getValueAt(row, TITLE);
+            Date start = (Date) jTable3.getValueAt(row, START);
+            Date end = (Date) jTable3.getValueAt(row, END);
+            
+            TimeSlot toEdit = new TimeSlot().setTitle(title);
+            toEdit.setStartTime(start);
+            toEdit.setEndTime(end);
+            
+            
+            JFrame newFrame = new JFrame("Update Schedule");
+            newFrame.add(new UpdateEmployeeSched(emp, this, toEdit, row, jTable3));
+            newFrame.pack();
+            newFrame.setVisible(true);
+                 
+    }//GEN-LAST:event_jButton7ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
