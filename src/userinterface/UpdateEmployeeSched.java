@@ -10,6 +10,7 @@ import javax.swing.JTable;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.TimeSlot;
+import meetingmanager.entity.ScheduledEntity;
 import static meetingmanager.userinterface.UIUtils.*;
 
 
@@ -149,6 +150,8 @@ public class UpdateEmployeeSched extends javax.swing.JPanel {
         if(title.length() < 1 || startTime.length() < 1 || endTime.length() < 1) {
             JOptionPane.showMessageDialog(null, "Must fill in all entries");
         }
+        
+        
         
         try {
             sTime = formatter.parse(startTime);
