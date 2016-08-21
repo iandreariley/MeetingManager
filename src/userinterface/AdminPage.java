@@ -49,6 +49,10 @@ public class AdminPage extends javax.swing.JPanel {
     public AdminPage(Employee employee) {
         initComponents();
         this.user = employee;
+        clearTable(jTable1);
+        clearTable(jTable2);
+        loadUsers();
+        loadRooms();
     }
     
     private void loadUsers() {
