@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.entity.TimeSlot;
 import meetingmanager.entity.Employee;
+import static meetingmanager.userinterface.UIUtils.*;
 /**
  *
  * @author Matthew
@@ -153,28 +154,36 @@ public class AddSchedulePage extends javax.swing.JPanel {
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
         
         if(title.length() < 1 || startTime.length() < 1 || endTime.length() < 1) {
-            JOptionPane.showMessageDialog(null, "Must fill in all entries");
+            showMessage("Must fill in all entries");
         }
         
         try {
             sTime = formatter.parse(startTime);
-            eTime = formatter.parse(endTime);            
-         
-        
-        TimeSlot newEvent = new TimeSlot()
-                .setTitle(title)
-                .setStartTime(sTime)
-                .setEndTime(eTime);
-        
-        
-            EmployeeControl.addEvent(emp, newEvent);
-            parent.addEvent(newEvent);
-            JOptionPane.showMessageDialog(null, "Event on " + newEvent.getStartTime() + " to "+ newEvent.getEndTime() + " added.");
+            eTime = formatter.parse(endTime);
             
+            if(sTime.after(eTime)) {
+                showMessage("Start time cannot be after end time! Time does not go backwards unless you're Marty McFly.");
+                return;
+            }
+            
+            TimeSlot newEvent = new TimeSlot()
+                    .setTitle(title)
+                    .setStartTime(sTime)
+                    .setEndTime(eTime);
+        
+        
+            if(EmployeeControl.addEvent(emp, newEvent)) {
+                parent.addEvent(newEvent);
+                showMessage("Event on " + newEvent.getStartTime() + " to "+ newEvent.getEndTime() + " added.");
+            } else {
+                showMessage("That event has a conflict! Please reschedule.");
+            }
+
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Problem");
+            showMessage("Problem");
             e.printStackTrace();
         }catch (ParseException e) {
+            showMessage("One or more times were in the wrong format. Please check your entries and try again");
             e.printStackTrace();
         }
     }//GEN-LAST:event_jButton1ActionPerformed

@@ -31,6 +31,7 @@ public class EmployeeControl {
      * @throws SQLException
      */
     public static boolean addEvent(Employee employee, TimeSlot event) throws SQLException {
+        employee.setSchedule(new TreeSet<>(getEmployeeSchedule(employee)));
         if(employee.isAvailable(event)) {
             EmployeeScheduleDatabase.getInstance().addEmployeeScheduleItem(employee, event);
             return true;
