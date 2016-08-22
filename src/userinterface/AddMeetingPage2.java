@@ -7,6 +7,8 @@ package userinterface;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import meetingmanager.entity.Employee;
+import static meetingmanager.userinterface.UIUtils.*;
 
 /**
  *
@@ -17,10 +19,14 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
     /**
      * Creates new form AddMeetingPage2
      */
-    public AddMeetingPage2() {
+    public AddMeetingPage2(String[] empArr ) {
         initComponents();
+        clearTable(jTable1);
     }
 
+    private void loadMeetings(){
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -35,7 +41,6 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -60,8 +65,11 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
         });
 
         jButton2.setText("OK");
-
-        jButton3.setText("Cancel");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -80,10 +88,8 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
                                 .addGap(1, 1, 1)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(68, 68, 68)
-                                .addComponent(jButton2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3)))))
+                                .addGap(83, 83, 83)
+                                .addComponent(jButton2)))))
                 .addContainerGap(121, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -96,8 +102,7 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(jButton2))
                 .addGap(21, 21, 21))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -110,11 +115,22 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
         AddMeetingPage2.this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // SELECT MEETING
+        int rowSelected = jTable1.getSelectedRow();
+        if(rowSelected < 0) {
+            showMessage("Please select a meeting first");
+            return;
+        }
+        
+        
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
