@@ -19,6 +19,19 @@ public class UIUtils {
         JOptionPane.showMessageDialog(null, message);
     }
     
+    public static int warn(String message) {
+        return JOptionPane.showOptionDialog(
+            null,
+            "Warning",
+            message,
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            new Object[] { "Yes", "No" },
+            "No"
+        );
+    }
+    
     public static void clearTable(JTable table) {
         tableData(table).getDataVector().removeAllElements();
     }

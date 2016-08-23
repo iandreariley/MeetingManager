@@ -7,19 +7,16 @@ package userinterface;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.Date;
+import java.util.SortedSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import meetingmanager.control.AdminControl;
 import meetingmanager.control.EmployeeControl;
-import meetingmanager.entity.Notification;
+import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
+import meetingmanager.entity.Meeting;
 import meetingmanager.entity.TimeSlot;
-import meetingmanager.exception.EntityNotFoundException;
-import meetingmanager.exception.MissingPrimaryKeyException;
 import static meetingmanager.userinterface.UIUtils.*;
 /**
  *
@@ -42,9 +39,25 @@ public class EmployeePage extends javax.swing.JPanel {
         clearTable(jTable3);
         this.emp = employee;
         loadSchedule();
+        loadMeetings();
     }
     
+    private void loadMeetings() {
+        try {
+            SortedSet<Meeting> meetings = MeetingControl.getOwnedMeetings(emp);
+            
+            for(Meeting meeting : meetings) {
+                addRow(jTable1, vectorizeMeeting(meeting));
+            }
+            
+        } catch (SQLException e) {
+            showMessage("Database error while loading meetings.");
+        }
+    }
     
+    private static Object[] vectorizeMeeting(Meeting meeting) {
+        return new Object[] {meeting.getTitle(), meeting.getStartTime(), meeting.getLocation().getLocation()};
+    }
     
     private void loadSchedule() {
         try {
@@ -57,6 +70,11 @@ public class EmployeePage extends javax.swing.JPanel {
         } catch (SQLException e) {
             showMessage(DATABASE_ERROR_MESSAGE);
         }
+    }
+    
+    public void refreshSchedule() {
+        clearTable(jTable3);
+        loadSchedule();
     }
     
     public void addEvent(TimeSlot event) {
@@ -141,8 +159,18 @@ public class EmployeePage extends javax.swing.JPanel {
         jLabel4.setText("Schedule");
 
         jButton3.setText("Delete");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Update");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         jButton5.setText("New");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -272,7 +300,7 @@ public class EmployeePage extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         JFrame newFrame = new JFrame("Create a Meeting");
-        newFrame.add(new AddMeetingPage(emp));
+        newFrame.add(new AddMeetingPage(emp).setParent(this));
         newFrame.pack();
         newFrame.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -359,6 +387,23 @@ public class EmployeePage extends javax.swing.JPanel {
             newFrame.pack();
             newFrame.setVisible(true);
     }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // UPDATE MEETING BUTTON
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // DELETE MEETING
+        if (jTable1.getSelectedRow() < 0)
+            return; 
+        
+        int row = jTable1.getSelectedRow();
+        int n = warn("Are you sure you want to delete this meeting?");
+        
+        if(n == JOptionPane.YES_OPTION) {
+            
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -26,6 +26,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
     public int LOGIN_ID = 0;
     public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     
+    private EmployeePage parent;
     private Employee owner;
 
     public AddMeetingPage(Employee owner) {
@@ -34,6 +35,11 @@ public class AddMeetingPage extends javax.swing.JPanel {
         clearTable(jTable2);
         this.owner = owner;
         loadEmployees();
+    }
+    
+    public AddMeetingPage setParent(EmployeePage parent) {
+        this.parent = parent;
+        return this;
     }
     
     private void loadEmployees() {
@@ -177,7 +183,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
         }
         
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
-        topFrame.add(new AddMeetingPage2(empArr, owner));
+        topFrame.add(new AddMeetingPage2(empArr, owner).setGrandParent(parent));
         AddMeetingPage.this.setVisible(false);
     }//GEN-LAST:event_jButton3ActionPerformed
 

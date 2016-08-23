@@ -120,6 +120,12 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
             return ret;
         }
         
+        public List<Meeting> getOwnedMeetings(Employee owner) throws SQLException {
+            return queryDatabase(
+                "SELECT * FROM meeting WHERE owner=" + stringify(owner.getLoginId())
+            );
+        }
+        
         private Map<Meeting, Boolean> convertToMap(ResultSet rs) throws SQLException {
             Map<Meeting, Boolean> updateMap = new HashMap<>();
 
