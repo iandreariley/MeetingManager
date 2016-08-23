@@ -52,6 +52,23 @@ public class EmployeeDatabase extends DatabaseConnection<Employee> {
 			employee.isAdmin() + ")"
 		);
 	}
+        
+        public List<Employee> getEmployeeList (String... loginIds) throws SQLException {
+            if(loginIds.length < 1)
+                return new ArrayList<>();
+            else
+                return queryDatabase(buildQueryFromLoginIdList(loginIds));
+        }
+        
+        private String buildQueryFromLoginIdList(String... loginIds) {
+            
+            String query = "SELECT * FROM employee WHERE login_id=" + stringify(loginIds[0]);
+            
+            for(int i = 1; i < loginIds.length; i++)
+                query += " OR login_id=" + stringify(loginIds[i]);
+            
+            return query;
+        }
 	
 	public Employee getEmployee(String loginId) throws SQLException, EntityNotFoundException {
 		List<Employee> results = queryDatabase("SELECT * FROM employee WHERE " + keyValue(LOGIN_ID, loginId));

@@ -56,11 +56,12 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
         
         public void addMeeting(Meeting meeting) throws SQLException {
             updateDatabase(
-                "INSERT INTO meeting ( "
+                "INSERT INTO meeting VALUES( "
                 + stringify(meeting.getOwner().getLoginId()) + LINE_SEP
                 + meeting.getStartTimeStamp() + LINE_SEP
                 + meeting.getEndTimeStamp() + LINE_SEP
-                + stringify(meeting.getLocation().getLocation()) + ")"
+                + stringify(meeting.getLocation().getLocation()) + LINE_SEP
+                + stringify(meeting.getTitle()) + ")"
             );
         }
         

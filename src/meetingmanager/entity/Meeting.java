@@ -1,15 +1,28 @@
 package meetingmanager.entity;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import meetingmanager.exception.InviteeNotFoundException;
 
 public class Meeting extends TimeSlot {
 
+    private static final Comparator<Employee> ALPHA_EMPLOYEE_SORTER;    
+    
 	private Room location;
 	private SortedSet<Employee> invited;
 	private SortedSet<Employee> attending;
 	private Employee owner;
+        
+    static {
+        ALPHA_EMPLOYEE_SORTER = new Comparator<Employee>(){
+            public int compare(Employee e1, Employee e2) {
+                return e1.getName().compareTo(e2.getName());
+            }
+        };
+    }
 	
 	public Meeting() {
 		super();
@@ -54,6 +67,13 @@ public class Meeting extends TimeSlot {
 		this.invited = invited;
 		return this;
 	}
+        
+        public Meeting setInvited(Collection<Employee> invited) {
+            
+            this.invited = new TreeSet<>(ALPHA_EMPLOYEE_SORTER);
+            invited.addAll(invited);
+            return this;
+        }
 	
 	public SortedSet<Employee> getAttending() {
 		return attending;

@@ -13,7 +13,9 @@ import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Notification;
+import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.InviteeNotFoundException;
+import meetingmanager.model.EmployeeDatabase;
 import meetingmanager.model.EmployeeScheduleDatabase;
 import meetingmanager.model.RoomScheduleDatabase;
 import meetingmanager.model.InvitationStatusDatabase;
@@ -48,6 +50,10 @@ public class MeetingControl {
             EmployeeScheduleDatabase.getInstance().deleteEmployeeScheduleItem(attendee, meeting);
             NotificationDatabase.getInstance().addNotification(new Notification(message, attendee));
         }
+    }
+    
+    public static List<Employee> getEmployees (String... loginIds) throws SQLException, EntityNotFoundException {
+        return EmployeeDatabase.getInstance().getEmployeeList(loginIds);
     }
     
     public static void acceptInvitation(Meeting meeting, Employee invitee) throws InviteeNotFoundException, SQLException {

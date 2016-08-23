@@ -5,23 +5,92 @@
  */
 package userinterface;
 
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
+import meetingmanager.entity.Meeting;
+import meetingmanager.entity.Room;
+import meetingmanager.entity.TimeSlot;
+import meetingmanager.exception.EntityNotFoundException;
 import static meetingmanager.userinterface.UIUtils.*;
+import static meetingmanager.utils.Utils.*;
 
 /**
  *
  * @author Matthew
  */
 public class AddMeetingPage2 extends javax.swing.JPanel {
+    
+    public static final int LOCATION = 0;
+    public static final int TIME = 1;
+    
+    private List<Employee> invitees;
+    private Employee owner;
+    private Map<Room,SortedSet<TimeSlot>> times;
+    private double durationInHours;
 
     /**
      * Creates new form AddMeetingPage2
      */
-    public AddMeetingPage2(String[] empArr ) {
+    public AddMeetingPage2(String[] empArr, Employee owner) {
         initComponents();
         clearTable(jTable1);
+        this.invitees = loadEmployees(empArr);
+        this.owner = owner;
+        this.durationInHours = 1;
+        this.times = loadMeetingTimes();
+        loadTimeTable();
+    }
+    
+    private void loadTimeTable() {
+        for(Room room : times.keySet()) {
+            for(TimeSlot time : times.get(room)) {
+                addRow(jTable1, new Object[] { room.getLocation(), time.getStartTime() });
+            }
+        }
+    }
+    
+    private List<Employee> getAllAttendees() {
+        List<Employee> attendees = new ArrayList<>(invitees);
+        attendees.add(owner);
+        return attendees;
+    }
+    
+    private Employee[] attendeesAsArray() {
+        List<Employee> allAttendees = getAllAttendees();
+        return allAttendees.toArray(new Employee[allAttendees.size()]);
+    }
+    
+    private Map<Room, SortedSet<TimeSlot>> loadMeetingTimes() {
+        try {
+            return MeetingControl.getCoincidingTimes(durationInHours, attendeesAsArray());
+        } catch (SQLException e) {
+            showMessage("Uh oh, something went wrong when trying to compile meeting times.");
+            e.printStackTrace();
+        }
+        return new HashMap<>();
+    }
+            
+    private List<Employee> loadEmployees(String[] empArr) {
+        try{
+            return MeetingControl.getEmployees(empArr);
+        } catch (SQLException e) {
+            showMessage("Error while attempting to access employee table");
+            e.printStackTrace();
+        } catch (EntityNotFoundException e) {
+            showMessage("Entity not found exception while trying to access employee table");
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     private void loadMeetings(){
@@ -111,7 +180,7 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
         // TODO add your handling code here:
         
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage2.this);
-        topFrame.add(new AddMeetingPage());
+        topFrame.add(new AddMeetingPage(owner));
         AddMeetingPage2.this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -121,13 +190,41 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
         if(rowSelected < 0) {
             showMessage("Please select a meeting first");
             return;
-        }
-        
-        
-        
+        } else {
+            Date startTime = (Date) jTable1.getValueAt(rowSelected, TIME);
+            Meeting meeting = new Meeting()
+                    .setLocation(findRoom((String) jTable1.getValueAt(rowSelected, LOCATION)))
+                    .setOwner(owner)
+                    .setInvited(invitees);
+                    
+            meeting.setTitle("test title");
+            meeting.setStartTime(startTime);
+            meeting.setEndTime(timeAfterInterval(startTime, durationInHours));
+            
+            try {
+                MeetingControl.addMeeting(meeting);
+            } catch(SQLException e) {
+                showMessage("Database issue while adding meeting.");
+                e.printStackTrace();
+            }
+        }  
     }//GEN-LAST:event_jButton2ActionPerformed
-
-
+    
+    private Date dateFromString(String dateString) {
+        try {
+            return LONG_DATETIME_FORMAT.parse(dateString);
+        } catch (ParseException e) {
+            showMessage("Uh oh. We blew it. ParsingException while trying to parse our own date strings. embarrassing.");
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private Room findRoom(String location) {
+        for (Room room : times.keySet())
+            if(room.getLocation().equals(location))
+                return room;
+        return null;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

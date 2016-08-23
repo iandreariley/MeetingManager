@@ -272,7 +272,7 @@ public class EmployeePage extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         JFrame newFrame = new JFrame("Create a Meeting");
-        newFrame.add(new AddMeetingPage());
+        newFrame.add(new AddMeetingPage(emp));
         newFrame.pack();
         newFrame.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
