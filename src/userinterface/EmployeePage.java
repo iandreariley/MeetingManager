@@ -8,6 +8,8 @@ package userinterface;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -28,6 +30,9 @@ public class EmployeePage extends javax.swing.JPanel {
      * Creates new form EmployeePage
      */
     private Employee emp;
+    private SortedSet<Meeting> meetings;
+    private Map<Integer, Meeting> rowMap;
+    
     public int TITLE = 0;
     public int START = 1;
     public int END = 2;
@@ -40,18 +45,35 @@ public class EmployeePage extends javax.swing.JPanel {
         this.emp = employee;
         loadSchedule();
         loadMeetings();
+        showMeetings();
+    }
+    
+    public void refreshMeetings() {
+        clearMeetings();
+        loadMeetings();
+        showMeetings();
+    }
+    
+    private void clearMeetings() {
+        clearTable(jTable1);
     }
     
     private void loadMeetings() {
         try {
-            SortedSet<Meeting> meetings = MeetingControl.getOwnedMeetings(emp);
-            
-            for(Meeting meeting : meetings) {
-                addRow(jTable1, vectorizeMeeting(meeting));
-            }
-            
+            meetings = MeetingControl.getOwnedMeetings(emp);
         } catch (SQLException e) {
             showMessage("Database error while loading meetings.");
+        }
+    }
+    
+    private void showMeetings() {
+        rowMap = new HashMap<Integer, Meeting>();
+        int row = 0;
+ 
+        for(Meeting meeting : meetings) {
+            addRow(jTable1, vectorizeMeeting(meeting));
+            rowMap.put(row, meeting);
+            row++;
         }
     }
     
@@ -401,7 +423,13 @@ public class EmployeePage extends javax.swing.JPanel {
         int n = warn("Are you sure you want to delete this meeting?");
         
         if(n == JOptionPane.YES_OPTION) {
-            
+            try {
+                Meeting meetingToDelete = rowMap.get(row);
+                MeetingControl.deleteMeeting(meetingToDelete);
+            } catch (SQLException e) {
+                showMessage("Database issue while trying to delete meeting.");
+                e.printStackTrace();
+            }
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 

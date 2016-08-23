@@ -72,7 +72,7 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
         
         public void deleteMeeting(Meeting meeting) throws SQLException {
             updateDatabase(
-               "DELETE FROM meeting WHERE ( "
+               "DELETE FROM meeting WHERE "
                + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
                + keyValue(START_TIME, meeting.getStartTime()) + AND
                + keyValue(END_TIME, meeting.getEndTime())

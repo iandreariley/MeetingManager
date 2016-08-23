@@ -50,6 +50,7 @@ public class MeetingControl {
         
         MeetingDatabase.getInstance().deleteMeeting(meeting);
         RoomScheduleDatabase.getInstance().deleteRoomScheduleItem(location, meeting);
+        InvitationStatusDatabase.getInstance().deleteMeeting(meeting);
         
         for(Employee attendee : attending) {
             EmployeeScheduleDatabase.getInstance().deleteEmployeeScheduleItem(attendee, meeting);
