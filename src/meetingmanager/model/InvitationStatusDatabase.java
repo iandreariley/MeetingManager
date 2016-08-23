@@ -119,7 +119,7 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
             "SELECT " + INVITEE + " FROM invitation_status WHERE "
             + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
             + keyValue(START_TIME, meeting.getStartTime()) + AND
-            + keyValue(END_TIME, meeting.getEndTime())
+            + keyValue(END_TIME, meeting.getEndTime()) + AND
             + keyValue(CONFIRMED, true) + ")"
         ); 
     }

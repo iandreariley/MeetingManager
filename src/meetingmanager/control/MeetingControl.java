@@ -44,7 +44,7 @@ public class MeetingControl {
     } 
     
     public static void deleteMeeting(Meeting meeting) throws SQLException {
-        SortedSet<Employee> attending = meeting.getAttending();
+        List<Employee> attending = InvitationStatusDatabase.getInstance().getAttendees(meeting);
         Room location = meeting.getLocation();
         String message = meetingCancelledMessage(meeting);
         

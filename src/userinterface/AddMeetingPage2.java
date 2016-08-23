@@ -210,6 +210,7 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
             try {
                 MeetingControl.addMeeting(meeting, false);
                 grandParent.refreshSchedule();
+                grandParent.refreshMeetings();
                 showMessage("Meeting added.");
             } catch(SQLException e) {
                 showMessage("Database issue while adding meeting.");

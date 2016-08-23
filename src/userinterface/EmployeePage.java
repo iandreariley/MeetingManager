@@ -426,6 +426,9 @@ public class EmployeePage extends javax.swing.JPanel {
             try {
                 Meeting meetingToDelete = rowMap.get(row);
                 MeetingControl.deleteMeeting(meetingToDelete);
+                refreshSchedule();
+                refreshMeetings();
+                showMessage("Meeting Deleted.");
             } catch (SQLException e) {
                 showMessage("Database issue while trying to delete meeting.");
                 e.printStackTrace();
