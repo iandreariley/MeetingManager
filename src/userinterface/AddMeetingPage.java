@@ -5,8 +5,17 @@
  */
 package userinterface;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import meetingmanager.control.MeetingControl;
+import meetingmanager.control.EmployeeControl;
+import meetingmanager.entity.Employee;
+import meetingmanager.entity.Notification;
+import meetingmanager.entity.TimeSlot;
+import static meetingmanager.userinterface.UIUtils.*;
 
 /**
  *
@@ -14,13 +23,44 @@ import javax.swing.SwingUtilities;
  */
 public class AddMeetingPage extends javax.swing.JPanel {
 
+    public int LOGIN_ID = 0;
+    public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     /**
      * Creates new form AddMeetingPage
      */
     public AddMeetingPage() {
         initComponents();
+        clearTable(jTable1);
+        clearTable(jTable2);
+        loadEmployees();
     }
 
+    public AddMeetingPage(Employee employee) {
+        initComponents();
+        clearTable(jTable1);
+        clearTable(jTable2);
+        loadEmployees();
+        
+        
+    }
+    
+    private void loadEmployees() {
+        try {
+            List<Employee> employees = EmployeeControl.getAllEmployees();
+            
+            for(int i = 0; i < employees.size(); i++) {
+                Object[] row = vectorizeEmployee(employees.get(i));
+                addRow(jTable1, row);
+            }
+        } catch (SQLException e) {
+            showMessage(DATABASE_ERROR_MESSAGE);
+        }
+    }
+    
+    private Object[] vectorizeEmployee(Employee employee) {
+        return new Object[] { employee.getName() };
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -55,6 +95,11 @@ public class AddMeetingPage extends javax.swing.JPanel {
         jScrollPane1.setViewportView(jTable1);
 
         jButton1.setText("Add ->");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -70,6 +115,11 @@ public class AddMeetingPage extends javax.swing.JPanel {
         jScrollPane2.setViewportView(jTable2);
 
         jButton2.setText("<- Remove");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("OK");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -122,12 +172,51 @@ public class AddMeetingPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+        // AFTER USERS ARE SELECTED, MOVE TO NEXT WINDOW TO SELECT ROOM
+        
+        int rowCount = jTable2.getRowCount();
+        System.out.println(rowCount);
+        String[] empArr = new String[rowCount+1];
+        
+        for(int i = 0; i < rowCount; i++){
+            String empS = (String)jTable2.getValueAt(i, LOGIN_ID);
+            empArr[i] = empS;
+            
+        }
         
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
-        topFrame.add(new AddMeetingPage2());
+        topFrame.add(new AddMeetingPage2(empArr));
         AddMeetingPage.this.setVisible(false);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // ADD USER TO SELECTED LIST
+        int rowSelected = jTable1.getSelectedRow();
+        if(rowSelected < 0) {
+            showMessage("Please select a user first");
+            return;
+        }
+                
+        String loginId = (String) jTable1.getValueAt(rowSelected, LOGIN_ID);
+            
+        addRow(jTable2, new Object[] { loginId } );
+        deleteRow(jTable1, rowSelected);
+                
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // REMOVE SELECTED EMPLOYEES FROM LIST
+        int rowSelected = jTable2.getSelectedRow();
+        if(rowSelected < 0) {
+            showMessage("Please select a user first");
+            return;
+        }
+        String loginId = (String) jTable2.getValueAt(rowSelected, LOGIN_ID);
+            
+        addRow(jTable1, new Object[] { loginId } );
+        deleteRow(jTable2, rowSelected);
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

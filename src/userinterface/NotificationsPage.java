@@ -5,19 +5,44 @@
  */
 package userinterface;
 
+import java.sql.SQLException;
+import java.util.List;
+import meetingmanager.control.EmployeeControl;
+import meetingmanager.entity.Employee;
+import meetingmanager.entity.Notification;
+import static meetingmanager.userinterface.UIUtils.*;
+
 /**
  *
  * @author Matthew
  */
 public class NotificationsPage extends javax.swing.JPanel{
-    
+    private Employee emp;
+    public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     /**
      * Creates new form NotificationsPage
      */
-    public NotificationsPage() {
+    public NotificationsPage(Employee employee) {
         initComponents();
+        this.emp = employee;
+        loadNotifications();
     }
 
+    private void loadNotifications() {
+        try {
+            List<Notification> notifications = EmployeeControl.getNotifications(emp);
+            
+            for(int i = 0; i < notifications.size(); i++) {
+                Object[] row = vectorizeNotification(notifications.get(i));
+                addRow(jTable1, row);
+            }
+        } catch (SQLException e) {
+            showMessage(DATABASE_ERROR_MESSAGE);
+        }
+    }
+    private Object[] vectorizeNotification(Notification notification) {
+        return new Object[] { notification.getMessage() };
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -138,11 +163,11 @@ public class NotificationsPage extends javax.swing.JPanel{
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
                         .addComponent(jButton1)
-                        .addGap(18, 18, 18)
+                        .addGap(28, 28, 28)
                         .addComponent(jButton2)
-                        .addGap(146, 146, 146))))
+                        .addGap(105, 105, 105))))
         );
     }// </editor-fold>//GEN-END:initComponents
 

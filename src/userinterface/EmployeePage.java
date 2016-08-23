@@ -38,32 +38,13 @@ public class EmployeePage extends javax.swing.JPanel {
     
     public EmployeePage(Employee employee) {
         initComponents();
-        jButton9.setVisible(false);
-        jButton10.setVisible(false);
         clearTable(jTable1);
-        clearTable(jTable2);
         clearTable(jTable3);
         this.emp = employee;
-        loadNotifications();
         loadSchedule();
     }
     
-    private void loadNotifications() {
-        try {
-            List<Notification> notifications = EmployeeControl.getNotifications(emp);
-            
-            for(int i = 0; i < notifications.size(); i++) {
-                Object[] row = vectorizeNotification(notifications.get(i));
-                addRow(jTable2, row);
-            }
-        } catch (SQLException e) {
-            showMessage(DATABASE_ERROR_MESSAGE);
-        }
-    }
     
-    private Object[] vectorizeNotification(Notification notification) {
-        return new Object[] { notification.getMessage() };
-    }
     
     private void loadSchedule() {
         try {
@@ -105,11 +86,8 @@ public class EmployeePage extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable3 = new javax.swing.JTable();
-        jButton2 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
@@ -118,9 +96,8 @@ public class EmployeePage extends javax.swing.JPanel {
         jButton6 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
         jButton11 = new javax.swing.JButton();
+        jButton12 = new javax.swing.JButton();
 
         jButton1.setText("New");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -146,27 +123,6 @@ public class EmployeePage extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
-            },
-            new String [] {
-                "Title", " "
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Boolean.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        jScrollPane2.setViewportView(jTable2);
-
         jTable3.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -179,8 +135,6 @@ public class EmployeePage extends javax.swing.JPanel {
             }
         ));
         jScrollPane3.setViewportView(jTable3);
-
-        jButton2.setText("Remove");
 
         jLabel3.setText("Notifications");
 
@@ -218,19 +172,17 @@ public class EmployeePage extends javax.swing.JPanel {
             }
         });
 
-        jButton9.setText("testadd");
-        jButton9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton9ActionPerformed(evt);
-            }
-        });
-
-        jButton10.setText("Decline");
-
         jButton11.setText("Update info");
         jButton11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton11ActionPerformed(evt);
+            }
+        });
+
+        jButton12.setText("Check new notifications");
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
             }
         });
 
@@ -241,18 +193,18 @@ public class EmployeePage extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(40, 40, 40)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                             .addComponent(jLabel3)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton12))
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel2)
                             .addGap(18, 18, 18)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel4)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGap(20, 20, 20)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(184, 184, 184)
@@ -266,16 +218,13 @@ public class EmployeePage extends javax.swing.JPanel {
                         .addComponent(jButton8))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton2)
                             .addComponent(jButton1)
                             .addComponent(jButton3)
                             .addComponent(jButton4)
                             .addComponent(jButton5)
                             .addComponent(jButton6)
-                            .addComponent(jButton7)
-                            .addComponent(jButton9)
-                            .addComponent(jButton10))
-                        .addGap(0, 14, Short.MAX_VALUE)))
+                            .addComponent(jButton7))
+                        .addGap(0, 18, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -299,17 +248,11 @@ public class EmployeePage extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton4))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addGap(3, 3, 3)
-                        .addComponent(jButton9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton10))
-                    .addComponent(jLabel3))
-                .addGap(18, 18, 18)
+                .addGap(38, 38, 38)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jButton12))
+                .addGap(56, 56, 56)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -357,11 +300,6 @@ public class EmployeePage extends javax.swing.JPanel {
         newFrame.pack();
         newFrame.setVisible(true);
     }//GEN-LAST:event_jButton11ActionPerformed
-
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // TODO add your handling code here:
-       
-    }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // DELETE FROM SCHEDULE
@@ -414,28 +352,32 @@ public class EmployeePage extends javax.swing.JPanel {
                  
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        // OPENS POPUP FOR NOTIFICATIONS
+        JFrame newFrame = new JFrame("Notifications");
+            newFrame.add(new NotificationsPage(emp));
+            newFrame.pack();
+            newFrame.setVisible(true);
+    }//GEN-LAST:event_jButton12ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
     // End of variables declaration//GEN-END:variables
 }
