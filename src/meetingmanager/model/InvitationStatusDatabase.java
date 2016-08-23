@@ -58,14 +58,15 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
         );
     }
     
-    public void addInvitation(Meeting meeting, Employee invitee) throws SQLException {
+    public void addInvitation(Meeting meeting, Employee invitee, boolean isUpdate) throws SQLException {
         updateDatabase(
-            "INSERT INTO TABLE invitation_status ( "
+            "INSERT INTO invitation_status VALUES( "
             + stringify(meeting.getOwner().getLoginId()) + LINE_SEP
             + meeting.getStartTimeStamp() + LINE_SEP
             + meeting.getEndTimeStamp() + LINE_SEP
             + stringify(invitee.getLoginId()) + LINE_SEP
-            + "NULL)"
+            + "NULL" + LINE_SEP
+            + isUpdate + ")"
         );
     }
     

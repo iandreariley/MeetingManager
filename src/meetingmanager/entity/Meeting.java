@@ -71,7 +71,7 @@ public class Meeting extends TimeSlot {
         public Meeting setInvited(Collection<Employee> invited) {
             
             this.invited = new TreeSet<>(ALPHA_EMPLOYEE_SORTER);
-            invited.addAll(invited);
+            this.invited.addAll(invited);
             return this;
         }
 	

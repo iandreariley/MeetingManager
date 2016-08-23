@@ -1,15 +1,20 @@
 package meetingmanager.model;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Employee;
 import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.MissingPrimaryKeyException;
+import static meetingmanager.model.DatabaseConnection.connect;
 
 public class MeetingDatabase extends DatabaseConnection<Meeting> {
     
@@ -97,16 +102,43 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
             );
         }
         
-        public List<Meeting> getUnconfirmedMeetings(Employee invitee) throws SQLException {
-            return queryDatabase(
-                "SELECT m." + LOCATION + ", i." + START_TIME + ", i." + END_TIME + ", i." + OWNER + " "
+        public Map<Meeting, Boolean> getUnconfirmedMeetings(Employee invitee) throws SQLException {
+            String query = 
+               "SELECT m." + LOCATION + ", i." + START_TIME + ", i." + END_TIME + ", i." + OWNER + " "
                 + "FROM meeting AS m, invitation_status AS i "
                 + "WHERE "
                 + keyValue("m." + OWNER, "i." + OWNER) + AND
                 + keyValue("m." + START_TIME, "i." + START_TIME) + AND
                 + keyValue("m." + END_TIME, "i." + END_TIME) + AND
-                + "i." + CONFIRMED + " IS NULL"
-            );
+                + "i." + CONFIRMED + " IS NULL";
+            
+            
+            Connection connection = connect();
+            Statement statement = connection.createStatement();
+            Map<Meeting, Boolean> ret = convertToMap(statement.executeQuery(query));
+            connection.close();
+            return ret;
+        }
+        
+        private Map<Meeting, Boolean> convertToMap(ResultSet rs) throws SQLException {
+            Map<Meeting, Boolean> updateMap = new HashMap<>();
+
+            try {
+                while(rs.next()) {
+                    Meeting next = new Meeting()
+                        .setLocation(RoomDatabase.getInstance().getRoom(rs.getString(LOCATION)))
+                        .setOwner(EmployeeDatabase.getInstance().getEmployee(rs.getString(OWNER)));
+                    next.setStartTime(rs.getLong(START_TIME));
+                    next.setEndTime(rs.getLong(END_TIME));
+                    Boolean isUpdate = rs.getBoolean(IS_UPDATE);
+                    updateMap.put(next, isUpdate);
+                }
+
+                return updateMap;
+            } catch(EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+            }
+            return null;
         }
         
         public List<Meeting> getUnconfirmedUpdates(Employee invitee) throws SQLException {
