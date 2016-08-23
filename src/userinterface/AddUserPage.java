@@ -129,8 +129,8 @@ public class AddUserPage extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
                                             
         System.out.println("Entering JTextFieldAction...");
-        String loginId = jTextField1.getText();
-        String username = jTextField2.getText();
+        String loginId = jTextField2.getText();
+        String username = jTextField1.getText();
         String password = String.valueOf(jPasswordField1.getPassword());
         boolean isAdmin = jCheckBox1.isSelected();
         
