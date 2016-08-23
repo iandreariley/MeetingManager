@@ -33,6 +33,7 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
     public static final int LOCATION = 0;
     public static final int TIME = 1;
     
+    private EmployeePage grandParent;
     private List<Employee> invitees;
     private Employee owner;
     private Map<Room,SortedSet<TimeSlot>> times;
@@ -49,6 +50,11 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
         this.durationInHours = 1;
         this.times = loadMeetingTimes();
         loadTimeTable();
+    }
+    
+    public AddMeetingPage2 setGrandParent(EmployeePage grandParent) {
+        this.grandParent = grandParent;
+        return this;
     }
     
     private void loadTimeTable() {
@@ -203,6 +209,8 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
             
             try {
                 MeetingControl.addMeeting(meeting, false);
+                grandParent.refreshSchedule();
+                showMessage("Meeting added.");
             } catch(SQLException e) {
                 showMessage("Database issue while adding meeting.");
                 e.printStackTrace();

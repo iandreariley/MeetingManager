@@ -32,15 +32,16 @@ public class MeetingControl {
         
         MeetingDatabase.getInstance().addMeeting(meeting);
         RoomScheduleDatabase.getInstance().addRoomScheduleItem(location, meeting);
+        EmployeeScheduleDatabase.getInstance().addEmployeeScheduleItem(meeting.getOwner(), meeting);
         
         for(Employee invitee : invitees) {
             InvitationStatusDatabase.getInstance().addInvitation(meeting, invitee, isUpdate);
         }
     }
     
-    public static Map<Meeting, Boolean> getUnconfirmedInvitations(Employee invitee) throws SQLException {
-        return MeetingDatabase.getInstance().getUnconfirmedMeetings(invitee);
-    }
+    public static SortedSet<Meeting> getOwnedMeetings(Employee owner) throws SQLException {
+        return new TreeSet<>(MeetingDatabase.getInstance().getOwnedMeetings(owner));
+    } 
     
     public static void deleteMeeting(Meeting meeting) throws SQLException {
         SortedSet<Employee> attending = meeting.getAttending();
