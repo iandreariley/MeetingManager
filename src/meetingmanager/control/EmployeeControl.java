@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import meetingmanager.entity.Employee;
@@ -60,7 +61,7 @@ public class EmployeeControl {
         return partialSchedule;
     }
     
-    public static List<Meeting> getInvitedMeetings(Employee employee) throws SQLException {
+    public static Map<Meeting, Boolean> getInvitedMeetings(Employee employee) throws SQLException {
         return MeetingDatabase.getInstance().getUnconfirmedMeetings(employee);
     }
     

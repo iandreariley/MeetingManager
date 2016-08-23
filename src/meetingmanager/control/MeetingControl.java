@@ -26,7 +26,7 @@ import static meetingmanager.utils.Utils.*;
 
 public class MeetingControl {
     
-    public static void addMeeting(Meeting meeting) throws SQLException {
+    public static void addMeeting(Meeting meeting, boolean isUpdate) throws SQLException {
         SortedSet<Employee> invitees = meeting.getInvited();
         Room location = meeting.getLocation();
         
@@ -34,8 +34,12 @@ public class MeetingControl {
         RoomScheduleDatabase.getInstance().addRoomScheduleItem(location, meeting);
         
         for(Employee invitee : invitees) {
-            InvitationStatusDatabase.getInstance().addInvitation(meeting, invitee);
+            InvitationStatusDatabase.getInstance().addInvitation(meeting, invitee, isUpdate);
         }
+    }
+    
+    public static Map<Meeting, Boolean> getUnconfirmedInvitations(Employee invitee) throws SQLException {
+        return MeetingDatabase.getInstance().getUnconfirmedMeetings(invitee);
     }
     
     public static void deleteMeeting(Meeting meeting) throws SQLException {

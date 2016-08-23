@@ -202,7 +202,7 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
             meeting.setEndTime(timeAfterInterval(startTime, durationInHours));
             
             try {
-                MeetingControl.addMeeting(meeting);
+                MeetingControl.addMeeting(meeting, false);
             } catch(SQLException e) {
                 showMessage("Database issue while adding meeting.");
                 e.printStackTrace();
