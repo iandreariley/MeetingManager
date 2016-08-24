@@ -218,22 +218,14 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
             }
         }  
     }//GEN-LAST:event_jButton2ActionPerformed
-    
-    private Date dateFromString(String dateString) {
-        try {
-            return LONG_DATETIME_FORMAT.parse(dateString);
-        } catch (ParseException e) {
-            showMessage("Uh oh. We blew it. ParsingException while trying to parse our own date strings. embarrassing.");
-            e.printStackTrace();
-        }
-        return null;
-    }
+
     private Room findRoom(String location) {
         for (Room room : times.keySet())
             if(room.getLocation().equals(location))
                 return room;
         return null;
     }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

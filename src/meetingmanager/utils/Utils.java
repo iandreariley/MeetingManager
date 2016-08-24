@@ -38,4 +38,8 @@ public class Utils {
     public static Date now() {
         return new Date(Calendar.getInstance().getTimeInMillis());
     }
+    
+    public Object[] vectorizeStrings(String... strings) {
+        return strings;
+    }
 }

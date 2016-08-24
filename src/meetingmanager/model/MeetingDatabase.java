@@ -141,8 +141,6 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
                     Boolean isUpdate = rs.getBoolean(IS_UPDATE);
                     updateMap.put(next, isUpdate);
                 }
-                
-                System.out.println("ResultSet Length: " + rs.getRow());
 
                 return updateMap;
             } catch(EntityNotFoundException e) {

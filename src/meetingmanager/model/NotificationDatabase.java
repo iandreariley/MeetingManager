@@ -54,8 +54,8 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
     public void addNotification(Notification notification) throws SQLException {
         updateDatabase(
             "INSERT INTO notification VALUES ( "
-            + stringify(notification.getRecipient().getLoginId())
-            + stringify(notification.getMessage())
+            + stringify(notification.getRecipient().getLoginId()) + LINE_SEP
+            + stringify(notification.getMessage()) + ")"
         );
     }
 
@@ -68,9 +68,11 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
     }
     
     public List<Notification> getNotifications(Employee recipient) throws SQLException {
-        return queryDatabase(
+        String query = 
             "SELECT * FROM notification WHERE "
-            + keyValue(RECIPIENT, recipient.getLoginId())
+            + keyValue(RECIPIENT, recipient.getLoginId());
+        return queryDatabase(
+                query
         );
     }
 
@@ -83,6 +85,7 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
                     rs.getString(MESSAGE),
                     EmployeeDatabase.getInstance().getEmployee(rs.getString(RECIPIENT))
                 );
+                results.add(result);
             }
         } catch(EntityNotFoundException e) {
             

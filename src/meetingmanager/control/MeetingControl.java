@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+import java.util.NavigableSet;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
@@ -25,6 +26,8 @@ import meetingmanager.model.RoomDatabase;
 import static meetingmanager.utils.Utils.*;
 
 public class MeetingControl {
+    
+    public static final int MAX_TIME_PER_ROOM = 15;
     
     public static void addMeeting(Meeting meeting, boolean isUpdate) throws SQLException {
         SortedSet<Employee> invitees = meeting.getInvited();
@@ -46,15 +49,18 @@ public class MeetingControl {
     public static void deleteMeeting(Meeting meeting) throws SQLException {
         List<Employee> attending = InvitationStatusDatabase.getInstance().getAttendees(meeting);
         Room location = meeting.getLocation();
-        String message = meetingCancelledMessage(meeting);
         
         MeetingDatabase.getInstance().deleteMeeting(meeting);
         RoomScheduleDatabase.getInstance().deleteRoomScheduleItem(location, meeting);
         InvitationStatusDatabase.getInstance().deleteMeeting(meeting);
         
+        String message = meetingCancelledMessage(meeting);
+        NotificationDatabase notificationDatabase = NotificationDatabase.getInstance();
+        EmployeeScheduleDatabase employeeScheduleDatabase = EmployeeScheduleDatabase.getInstance();
+        
         for(Employee attendee : attending) {
-            EmployeeScheduleDatabase.getInstance().deleteEmployeeScheduleItem(attendee, meeting);
-            NotificationDatabase.getInstance().addNotification(new Notification(message, attendee));
+            employeeScheduleDatabase.deleteEmployeeScheduleItem(attendee, meeting);
+            notificationDatabase.addNotification(new Notification(message, attendee));
         }
     }
     
@@ -63,14 +69,21 @@ public class MeetingControl {
     }
     
     public static void acceptInvitation(Meeting meeting, Employee invitee) throws InviteeNotFoundException, SQLException {
-        meeting.isAttending(invitee);
         EmployeeScheduleDatabase.getInstance().addEmployeeScheduleItem(invitee, meeting);
         InvitationStatusDatabase.getInstance().updateInvitationStatus(invitee, meeting, true);
     }
     
     public static void declineInvitation(Meeting meeting, Employee invitee) throws SQLException {
-        meeting.getInvited().remove(invitee);
         InvitationStatusDatabase.getInstance().updateInvitationStatus(invitee, meeting, false);
+        NotificationDatabase.getInstance().addNotification(declinedInvitationNotification(meeting, invitee));
+    }
+    
+    public static Notification declinedInvitationNotification (Meeting meeting, Employee invitee) {
+        return new Notification(declinedInvitationMessage(meeting, invitee), meeting.getOwner());
+    }
+    
+    public static String declinedInvitationMessage(Meeting meeting, Employee invitee) {
+        return invitee.getLoginId() + " has declined your invitation to meet on " + meeting.getStartTime();
     }
     
     public static Map<Room, SortedSet<TimeSlot>> getCoincidingTimes(double meetingDurationInHours, Employee... invitees) throws SQLException {
@@ -102,33 +115,54 @@ public class MeetingControl {
         combinedRoomAndEmployeeSchedule.addAll(inviteeSchedules);
         combinedRoomAndEmployeeSchedule.addAll(RoomScheduleDatabase.getInstance().getRoomSchedule(room));
         
-        return getAvailableRoomtimes(combinedRoomAndEmployeeSchedule, meetingDurationInHours);
+        return getAvailableRoomTimes(allTimesAfterNow(combinedRoomAndEmployeeSchedule), meetingDurationInHours);
     }
     
-    private static SortedSet<TimeSlot> getAvailableRoomtimes(TreeSet<TimeSlot> combinedRoomAndEmployeeSchedule, double meetingDurationInHours) {
-        SortedSet<TimeSlot> availableTimes = new TreeSet<>();
+    /**
+     * Precondition combinedRoomAndEmployeeSchedule must have at least one timeslot with an endtime equivalent to now.
+     * Look at "allTimesAfterNow" for reference.
+     * @param combinedRoomAndEmployeeSchedule
+     * @param meetingDurationInHours
+     * @return 
+     */
+    private static SortedSet<TimeSlot> getAvailableRoomTimes(NavigableSet<TimeSlot> combinedRoomAndEmployeeSchedule, double meetingDurationInHours) {
+        TreeSet<TimeSlot> availableTimes = new TreeSet<>();
         long meetingDurationInMilliseconds = hoursToMilliseconds(meetingDurationInHours);
-        
-        // If the schedule is empty, then make the room available now.
-        if(combinedRoomAndEmployeeSchedule.isEmpty()) {
-            availableTimes.add(newAvailableTime(now(), meetingDurationInMilliseconds));
-            return availableTimes;
-        }
-        
-        TimeSlot previous = combinedRoomAndEmployeeSchedule.first();
-        combinedRoomAndEmployeeSchedule.remove(previous);
+        TimeSlot previous = timeSlotForCurrentInstant();
         
         for(TimeSlot next : combinedRoomAndEmployeeSchedule) {
             long timeBetweenEvents = elapsedTime(previous.getEndTime(), next.getStartTime());
-            if(timeBetweenEvents >= meetingDurationInMilliseconds)
-                availableTimes.add(newAvailableTime(previous.getEndTime(), meetingDurationInMilliseconds));
+            Date startTime = previous.getEndTime();
+            
+            while(timeBetweenEvents >= meetingDurationInMilliseconds && availableTimes.size() < MAX_TIME_PER_ROOM) { 
+                TimeSlot newAvailableMeetingTime = newAvailableTime(startTime, meetingDurationInMilliseconds);
+                availableTimes.add(newAvailableMeetingTime);
+                
+                timeBetweenEvents -= meetingDurationInHours;
+                startTime = newAvailableMeetingTime.getEndTime();
+            }
+            
             previous = next;
+            
+            if(availableTimes.size() >= MAX_TIME_PER_ROOM)
+                break;
         }
         
-        // Default: Add an available time after all scheduled events.
-        availableTimes.add(newAvailableTime(previous.getEndTime(), meetingDurationInMilliseconds));
+        Date nextStartTime = previous.getEndTime();
+        while(availableTimes.size() < MAX_TIME_PER_ROOM) {
+            availableTimes.add(newAvailableTime(nextStartTime, meetingDurationInMilliseconds));
+            nextStartTime = timeAfterInterval(nextStartTime, meetingDurationInMilliseconds);
+        }        
         
         return availableTimes;
+    }
+    
+    private static TimeSlot timeSlotForCurrentInstant() {
+        return new TimeSlot().setStartTime(now()).setEndTime(now());
+    }
+    
+    private static NavigableSet<TimeSlot> allTimesAfterNow(TreeSet<TimeSlot> schedule) {
+        return schedule.subSet(schedule.ceiling(timeSlotForCurrentInstant()), true, schedule.last(), true);
     }
     
     private static TimeSlot newAvailableTime(Date startTime, long durationInMilliseconds) {

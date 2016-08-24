@@ -6,17 +6,20 @@
 package userinterface;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JCheckBox;
+import javax.swing.JTable;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Notification;
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Room;
-import static meetingmanager.userinterface.UIUtils.*;
 import meetingmanager.exception.InviteeNotFoundException;
+import static meetingmanager.userinterface.UIUtils.*;
 
 /**
  *
@@ -24,7 +27,10 @@ import meetingmanager.exception.InviteeNotFoundException;
  */
 public class NotificationsPage extends javax.swing.JPanel{
     private Employee emp;
-    private Map<Integer, Meeting> rowMap;
+    private Map<Integer, Meeting> invitationRowMap;
+    private Map<Meeting, Boolean> invitations;
+    private List<Notification> notifications;
+    private Map<Integer, Notification> notificationRowMap;
     public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     /**
      * Creates new form NotificationsPage
@@ -34,45 +40,55 @@ public class NotificationsPage extends javax.swing.JPanel{
         this.emp = employee;
         clearTable(jTable1);
         clearTable(jTable2);
-//        loadNotifications();
+        loadNotifications();
         loadInvites();
     }
-/*
+
     private void loadNotifications() {
         try {
-            List<Notification> notifications = EmployeeControl.getNotifications(emp);
+            notifications = EmployeeControl.getNotifications(emp);
+            notificationRowMap = new HashMap<>();
             
+            int rowNumber = 0;
             for(int i = 0; i < notifications.size(); i++) {
                 Object[] row = vectorizeNotification(notifications.get(i));
-                addRow(jTable1, row);
+                addRow(jTable2, row);
+                notificationRowMap.put(rowNumber, notifications.get(i));
             }
         } catch (SQLException e) {
             showMessage(DATABASE_ERROR_MESSAGE);
         }
     }
+    
+    private void removeNotification(int row) {
+        int oldSize = notificationRowMap.size();
+        notifications.remove(notificationRowMap.remove(row));
+        deleteRow(jTable2, row);
+        
+        for(int i = row + 1; i < oldSize; i++) {
+            notificationRowMap.put(i - 1, notificationRowMap.remove(i));
+        }
+    }
+    
     private Object[] vectorizeNotification(Notification notification) {
         return new Object[] { notification.getMessage() };
     }
-*/    
+    
     private void loadInvites(){
         try{
-            Map<Meeting, Boolean> invites = EmployeeControl.getInvitedMeetings(emp);
-            rowMap = new HashMap<Integer, Meeting>();
-            int rowN = 0;
+            int rowNumber = 0;
+            invitations = EmployeeControl.getInvitedMeetings(emp);
+            invitationRowMap = new HashMap<>();
             
-            for(Meeting meeting: invites.keySet()){
-                Boolean isUpdate = invites.get(meeting);
+            for(Meeting meeting: invitations.keySet()){
                 Employee owner = meeting.getOwner();
-                    System.out.println(owner.getName());
                 Room room = meeting.getLocation();
-                    System.out.println(room.getLocation());
                 Object[] row = vectorizeInvites(owner, room);
+                invitationRowMap.put(rowNumber, meeting);
                 addRow(jTable1, row);
-                
-                rowMap.put(rowN, meeting);
-                rowN++;
-            }            
-        }catch(SQLException e){
+            }
+            
+        } catch (SQLException e){
             showMessage(DATABASE_ERROR_MESSAGE);
             e.printStackTrace();
         }
@@ -104,6 +120,19 @@ public class NotificationsPage extends javax.swing.JPanel{
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title", "Owner", "Start Time", "End time"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
                 {null},
                 {null},
                 {null},
@@ -113,27 +142,6 @@ public class NotificationsPage extends javax.swing.JPanel{
                 "Title"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
-
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
-            },
-            new String [] {
-                "Title", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Boolean.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
         jScrollPane2.setViewportView(jTable2);
 
         jLabel1.setText("Notifications");
@@ -150,8 +158,18 @@ public class NotificationsPage extends javax.swing.JPanel{
         });
 
         jButton2.setText("Decline");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Dismiss");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -166,24 +184,22 @@ public class NotificationsPage extends javax.swing.JPanel{
                         .addGap(64, 64, 64)
                         .addComponent(jLabel3))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(53, 53, 53)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButton1)
-                                    .addComponent(jButton2)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(jButton3)
-                                .addGap(8, 8, 8))))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(64, 64, 64)
-                        .addComponent(jLabel2)))
-                .addContainerGap(30, Short.MAX_VALUE))
+                        .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(239, 239, 239)
+                        .addComponent(jButton1)
+                        .addGap(117, 117, 117)
+                        .addComponent(jButton2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 732, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton3)))))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -192,51 +208,89 @@ public class NotificationsPage extends javax.swing.JPanel{
                 .addComponent(jLabel1)
                 .addGap(55, 55, 55)
                 .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(jButton3)))
-                .addGap(43, 43, 43)
-                .addComponent(jLabel3)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(43, 43, 43))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addGap(28, 28, 28)
-                        .addComponent(jButton2)
-                        .addGap(105, 105, 105))))
+                        .addComponent(jButton3)
+                        .addGap(91, 91, 91)))
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addContainerGap(58, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // ACCEPT INVITATION
-        try {
-            if (jTable1.getSelectedRow() < 0)
-                return;
-            
-            int row = jTable1.getSelectedRow();
-                        
-            Meeting meeting = rowMap.get(row);
-            //get employee schedule into emp
-            MeetingControl.acceptInvitation(meeting, emp);
+        if(jTable1.getSelectedRow() < 0)
+            return;
         
-            showMessage("Accepted invitation");
-            
-        }catch (SQLException e) {
-            showMessage("Something went horribly wrong with the database");
+        try {
+            int row = jTable1.getSelectedRow();
+            Meeting meeting = invitationRowMap.get(row);
+            MeetingControl.acceptInvitation(meeting, emp);
+            removeInvitation(row);
+            showMessage("Thank you! You are now attending " + meeting.getTitle());
+        } catch (SQLException e) {
+            showMessage("Database error while trying to accept invitation.");
             e.printStackTrace();
-        }catch(InviteeNotFoundException e)  {
-            showMessage("Invitee not found exception");           
-        }   
+        } catch (InviteeNotFoundException e) {
+            showMessage("Apparently you weren't actually invited to this meeting. Whoops!");
+            e.printStackTrace();
+        }
+    }                                        
+
+    private void removeInvitation(int row) {
+        deleteRow(jTable1, row);
+        int oldSize = invitationRowMap.size();       
+        invitations.remove(invitationRowMap.remove(row));
+        
+        for(int i = row + 1; i < oldSize; i++) {
+            invitationRowMap.put(i - 1, invitationRowMap.remove(i));
+        }
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // DECLINE INVITATION
+        if(jTable1.getSelectedRow() < 0)
+            return;
+        
+        int row = jTable1.getSelectedRow();
+        try {
+            Meeting meeting = invitationRowMap.get(row);
+            MeetingControl.declineInvitation(meeting, emp);
+            removeInvitation(row);
+            showMessage("Meeting invitation declined.");
+        } catch (SQLException e) {
+            showMessage("Database error while trying to decline invitation.");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // REMOVE NOTIFICATION
+        int[] selectedRows = jTable2.getSelectedRows();
+        
+        try {
+
+            for(int i = 0; i < selectedRows.length; i++) {
+                Notification notification = notificationRowMap.get(selectedRows[i]);
+                EmployeeControl.deleteNotification(notification);
+                removeNotification(selectedRows[i]);
+            }
+        } catch (SQLException e) {
+            showMessage("Database error while deleting notifications.");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
