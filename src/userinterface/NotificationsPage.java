@@ -6,14 +6,17 @@
 package userinterface;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import meetingmanager.control.EmployeeControl;
+import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Notification;
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Room;
 import static meetingmanager.userinterface.UIUtils.*;
+import meetingmanager.exception.InviteeNotFoundException;
 
 /**
  *
@@ -21,6 +24,7 @@ import static meetingmanager.userinterface.UIUtils.*;
  */
 public class NotificationsPage extends javax.swing.JPanel{
     private Employee emp;
+    private Map<Integer, Meeting> rowMap;
     public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     /**
      * Creates new form NotificationsPage
@@ -53,6 +57,9 @@ public class NotificationsPage extends javax.swing.JPanel{
     private void loadInvites(){
         try{
             Map<Meeting, Boolean> invites = EmployeeControl.getInvitedMeetings(emp);
+            rowMap = new HashMap<Integer, Meeting>();
+            int rowN = 0;
+            
             for(Meeting meeting: invites.keySet()){
                 Boolean isUpdate = invites.get(meeting);
                 Employee owner = meeting.getOwner();
@@ -61,6 +68,9 @@ public class NotificationsPage extends javax.swing.JPanel{
                     System.out.println(room.getLocation());
                 Object[] row = vectorizeInvites(owner, room);
                 addRow(jTable1, row);
+                
+                rowMap.put(rowN, meeting);
+                rowN++;
             }            
         }catch(SQLException e){
             showMessage(DATABASE_ERROR_MESSAGE);
@@ -133,6 +143,11 @@ public class NotificationsPage extends javax.swing.JPanel{
         jLabel3.setText("Please Respond");
 
         jButton1.setText("Accept");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Decline");
 
@@ -199,6 +214,28 @@ public class NotificationsPage extends javax.swing.JPanel{
                         .addGap(105, 105, 105))))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // ACCEPT INVITATION
+        try {
+            if (jTable1.getSelectedRow() < 0)
+                return;
+            
+            int row = jTable1.getSelectedRow();
+                        
+            Meeting meeting = rowMap.get(row);
+            //get employee schedule into emp
+            MeetingControl.acceptInvitation(meeting, emp);
+        
+            showMessage("Accepted invitation");
+            
+        }catch (SQLException e) {
+            showMessage("Something went horribly wrong with the database");
+            e.printStackTrace();
+        }catch(InviteeNotFoundException e)  {
+            showMessage("Invitee not found exception");           
+        }   
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
