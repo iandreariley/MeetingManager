@@ -6,13 +6,16 @@
 package userinterface;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import meetingmanager.control.EmployeeControl;
+import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Notification;
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Room;
+import meetingmanager.exception.InviteeNotFoundException;
 import static meetingmanager.userinterface.UIUtils.*;
 
 /**
@@ -21,6 +24,8 @@ import static meetingmanager.userinterface.UIUtils.*;
  */
 public class NotificationsPage extends javax.swing.JPanel{
     private Employee emp;
+    private Map<Integer, Meeting> invitationRowMap;
+    private Map<Meeting, Boolean> invitations;
     public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     /**
      * Creates new form NotificationsPage
@@ -52,17 +57,19 @@ public class NotificationsPage extends javax.swing.JPanel{
 */    
     private void loadInvites(){
         try{
-            Map<Meeting, Boolean> invites = EmployeeControl.getInvitedMeetings(emp);
-            for(Meeting meeting: invites.keySet()){
-                Boolean isUpdate = invites.get(meeting);
+            int rowNumber = 0;
+            invitations = EmployeeControl.getInvitedMeetings(emp);
+            invitationRowMap = new HashMap<>();
+            
+            for(Meeting meeting: invitations.keySet()){
                 Employee owner = meeting.getOwner();
-                    System.out.println(owner.getName());
                 Room room = meeting.getLocation();
-                    System.out.println(room.getLocation());
                 Object[] row = vectorizeInvites(owner, room);
+                invitationRowMap.put(rowNumber, meeting);
                 addRow(jTable1, row);
-            }            
-        }catch(SQLException e){
+            }
+            
+        } catch (SQLException e){
             showMessage(DATABASE_ERROR_MESSAGE);
             e.printStackTrace();
         }
@@ -133,8 +140,18 @@ public class NotificationsPage extends javax.swing.JPanel{
         jLabel3.setText("Please Respond");
 
         jButton1.setText("Accept");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Decline");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Dismiss");
 
@@ -199,6 +216,53 @@ public class NotificationsPage extends javax.swing.JPanel{
                         .addGap(105, 105, 105))))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // ACCEPT INVITATION
+        if(jTable1.getSelectedRow() < 0)
+            return;
+        
+        try {
+            int row = jTable1.getSelectedRow();
+            Meeting meeting = invitationRowMap.get(row);
+            MeetingControl.acceptInvitation(meeting, emp);
+            removeInvitation(row);
+            showMessage("Thank you! You are now attending " + meeting.getTitle());
+        } catch (SQLException e) {
+            showMessage("Database error while trying to accept invitation.");
+            e.printStackTrace();
+        } catch (InviteeNotFoundException e) {
+            showMessage("Apparently you weren't actually invited to this meeting. Whoops!");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void removeInvitation(int row) {
+        int oldSize = invitationRowMap.size();
+        Meeting meeting = invitationRowMap.remove(row);
+        invitations.remove(meeting);
+        
+        for(int i = row + 1; i < oldSize; i++) {
+            invitationRowMap.put(i - 1, invitationRowMap.remove(i));
+        }
+        
+    }
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // DECLINE INVITATION
+        if(jTable1.getSelectedRow() < 0)
+            return;
+        
+        int row = jTable1.getSelectedRow();
+        try {
+            Meeting meeting = invitationRowMap.get(row);
+            MeetingControl.declineInvitation(meeting, emp);
+            removeInvitation(row);
+            showMessage("Meeting invitation declined.");
+        } catch (SQLException e) {
+            showMessage("Database error while trying to decline invitation.");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

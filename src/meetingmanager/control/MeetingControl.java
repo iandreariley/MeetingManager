@@ -69,14 +69,21 @@ public class MeetingControl {
     }
     
     public static void acceptInvitation(Meeting meeting, Employee invitee) throws InviteeNotFoundException, SQLException {
-        meeting.isAttending(invitee);
         EmployeeScheduleDatabase.getInstance().addEmployeeScheduleItem(invitee, meeting);
         InvitationStatusDatabase.getInstance().updateInvitationStatus(invitee, meeting, true);
     }
     
     public static void declineInvitation(Meeting meeting, Employee invitee) throws SQLException {
-        meeting.getInvited().remove(invitee);
         InvitationStatusDatabase.getInstance().updateInvitationStatus(invitee, meeting, false);
+        NotificationDatabase.getInstance().addNotification(declinedInvitationNotification(meeting, invitee));
+    }
+    
+    public static Notification declinedInvitationNotification (Meeting meeting, Employee invitee) {
+        return new Notification(declinedInvitationMessage(meeting, invitee), meeting.getOwner());
+    }
+    
+    public static String declinedInvitationMessage(Meeting meeting, Employee invitee) {
+        return invitee.getLoginId() + " has declined your invitation to meet on " + meeting.getStartTime();
     }
     
     public static Map<Room, SortedSet<TimeSlot>> getCoincidingTimes(double meetingDurationInHours, Employee... invitees) throws SQLException {

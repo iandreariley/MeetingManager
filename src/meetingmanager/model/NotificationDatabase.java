@@ -54,11 +54,12 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
     public void addNotification(Notification notification) throws SQLException {
         updateDatabase(
             "INSERT INTO notification VALUES ( "
-            + stringify(notification.getRecipient().getLoginId())
-            + stringify(notification.getMessage())
+            + stringify(notification.getRecipient().getLoginId()) + LINE_SEP
+            + stringify(notification.getMessage()) + ")"
         );
     }
 
+    //1472064275520 | 1472067875520
     public void deleteNotification(Notification notification) throws SQLException {
         updateDatabase(
             "DELETE FROM notification WHERE "

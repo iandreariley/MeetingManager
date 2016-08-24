@@ -85,8 +85,8 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
     public void updateInvitationStatus(Employee employee, Meeting meeting, boolean isAttending) throws SQLException {
         updateDatabase(
             "UPDATE invitation_status SET "
-            + keyValue(CONFIRMED, isAttending) + 
-            "WHERE "
+            + keyValue(CONFIRMED, isAttending) +
+            " WHERE "
             + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
             + keyValue(START_TIME, meeting.getStartTime()) + AND
             + keyValue(END_TIME, meeting.getEndTime()) + AND
