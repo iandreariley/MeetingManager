@@ -24,6 +24,7 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
         public static final String OWNER = "owner";
         public static final String CONFIRMED = "confirmed";
         public static final String IS_UPDATE = "is_update";
+        public static final String INVITEE = "invitee";
         private static MeetingDatabase instance;
         
         static {
@@ -110,6 +111,7 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
                 + columnEquals("m." + OWNER, "i." + OWNER) + AND
                 + columnEquals("m." + START_TIME, "i." + START_TIME) + AND
                 + columnEquals("m." + END_TIME, "i." + END_TIME) + AND
+                + keyValue("i." + INVITEE, invitee.getLoginId()) + AND
                 + "i." + CONFIRMED + " IS NULL";
             
             
