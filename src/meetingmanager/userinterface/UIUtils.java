@@ -19,7 +19,7 @@ public class UIUtils {
         JOptionPane.showMessageDialog(null, message);
     }
     
-    public static int warn(String message) {
+    public static boolean warn(String message) {
         return JOptionPane.showOptionDialog(
             null,
             "Warning",
@@ -29,7 +29,7 @@ public class UIUtils {
             null,
             new Object[] { "Yes", "No" },
             "No"
-        );
+        ) == JOptionPane.YES_OPTION;
     }
     
     public static void clearTable(JTable table) {

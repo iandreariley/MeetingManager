@@ -42,4 +42,14 @@ public class Employee extends ScheduledEntity {
 	public String getPassword() {
 		return password;
 	}
+        
+        @Override
+        public boolean equals(Object obj) {
+            try {
+                Employee employee = (Employee) obj;
+                return this.loginId.equals(employee.loginId);
+            } catch(ClassCastException e) {
+                return false;
+            }
+        }
 }

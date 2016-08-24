@@ -8,12 +8,15 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.NavigableSet;
+import java.util.Set;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Notification;
+import meetingmanager.entity.ScheduledEntity;
 import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.InviteeNotFoundException;
 import meetingmanager.model.EmployeeDatabase;
@@ -37,9 +40,19 @@ public class MeetingControl {
         RoomScheduleDatabase.getInstance().addRoomScheduleItem(location, meeting);
         EmployeeScheduleDatabase.getInstance().addEmployeeScheduleItem(meeting.getOwner(), meeting);
         
-        for(Employee invitee : invitees) {
-            InvitationStatusDatabase.getInstance().addInvitation(meeting, invitee, isUpdate);
+        invite(invitees, meeting, isUpdate);
+    }
+    
+    public static boolean conflictsExist(Set<Employee> attendees, Meeting meeting) {
+        if(attendees.size() > meeting.getLocation().getCapacity())
+            return true;
+        
+        for(Employee attendee : attendees) {
+            if(!attendee.isAvailable(meeting))
+                return true;
         }
+        
+        return false;
     }
     
     public static SortedSet<Meeting> getOwnedMeetings(Employee owner) throws SQLException {
@@ -61,6 +74,33 @@ public class MeetingControl {
         for(Employee attendee : attending) {
             employeeScheduleDatabase.deleteEmployeeScheduleItem(attendee, meeting);
             notificationDatabase.addNotification(new Notification(message, attendee));
+        }
+    }
+    
+    public static void updateInviteeList(Set<Employee> original, Set<Employee> newList, Meeting meeting) throws SQLException {
+        Set<Employee> removed = setDifference(original, newList);
+        Set<Employee> added = setDifference(newList, original);
+        handleRemoval(removed, meeting);
+        invite(added, meeting, false);
+    }
+    
+    private static void handleRemoval(Set<Employee> toRemove, Meeting meeting) throws SQLException {
+        for (Employee removed : toRemove) {
+            NotificationDatabase.getInstance().addNotification(removalNotification(removed, meeting));
+        }
+    }
+    
+    private static Notification removalNotification(Employee employee, Meeting meeting) {
+        return new Notification(newRemovalMessage(employee, meeting), employee);
+    }
+    
+    private static String newRemovalMessage(Employee employee, Meeting meeting) {
+        return "You are no longer required to attend " + meeting.getTitle() + " at " + meeting.getStartTime();
+    }
+    
+    public static void invite(Set<Employee> invitees, Meeting meeting, boolean isUpdate) throws SQLException {
+        for(Employee invitee : invitees) {
+            InvitationStatusDatabase.getInstance().addInvitation(meeting, invitee, isUpdate);
         }
     }
     
@@ -179,5 +219,11 @@ public class MeetingControl {
             meeting.getEndTime().toString(),
             meeting.getOwner().getName()
         );
+    }
+    
+    private static <T> Set<T> setDifference(Set<T> op1, Set<T> op2) {
+        Set<T> difference = new HashSet<>(op1);
+        op1.removeAll(op2);
+        return op1;
     }
 }

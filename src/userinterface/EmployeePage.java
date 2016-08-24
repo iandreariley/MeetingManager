@@ -420,9 +420,8 @@ public class EmployeePage extends javax.swing.JPanel {
             return; 
         
         int row = jTable1.getSelectedRow();
-        int n = warn("Are you sure you want to delete this meeting?");
         
-        if(n == JOptionPane.YES_OPTION) {
+        if(warn("Are you sure you want to delete this meeting?")) {
             try {
                 Meeting meetingToDelete = rowMap.get(row);
                 MeetingControl.deleteMeeting(meetingToDelete);

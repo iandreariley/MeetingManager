@@ -26,8 +26,8 @@ public class AddMeetingPage extends javax.swing.JPanel {
     public int LOGIN_ID = 0;
     public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     
-    private EmployeePage parent;
-    private Employee owner;
+    protected EmployeePage parent;
+    protected Employee owner;
 
     public AddMeetingPage(Employee owner) {
         initComponents();
@@ -171,22 +171,32 @@ public class AddMeetingPage extends javax.swing.JPanel {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // AFTER USERS ARE SELECTED, MOVE TO NEXT WINDOW TO SELECT ROOM
-        
+        moveToNextWindow();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    protected void moveToNextWindow() {
+        String[] empArr =  getSelectedEmployees();
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
+        topFrame.add(new AddMeetingPage2(empArr, owner).setGrandParent(parent));
+        AddMeetingPage.this.setVisible(false);
+    }
+    
+    protected JFrame getMainWindow() {
+        return (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
+    }
+    
+    protected String[] getSelectedEmployees() {
         int rowCount = jTable2.getRowCount();
-        System.out.println(rowCount);
         String[] empArr = new String[rowCount+1];
         
         for(int i = 0; i < rowCount; i++){
             String empS = (String)jTable2.getValueAt(i, LOGIN_ID);
             empArr[i] = empS;
-            
         }
         
-        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
-        topFrame.add(new AddMeetingPage2(empArr, owner).setGrandParent(parent));
-        AddMeetingPage.this.setVisible(false);
-    }//GEN-LAST:event_jButton3ActionPerformed
-
+        return empArr;
+    }
+    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // ADD USER TO SELECTED LIST
         int rowSelected = jTable1.getSelectedRow();
