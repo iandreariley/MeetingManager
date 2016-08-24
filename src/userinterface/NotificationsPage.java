@@ -6,9 +6,12 @@
 package userinterface;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JCheckBox;
+import javax.swing.JTable;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
@@ -26,6 +29,8 @@ public class NotificationsPage extends javax.swing.JPanel{
     private Employee emp;
     private Map<Integer, Meeting> invitationRowMap;
     private Map<Meeting, Boolean> invitations;
+    private List<Notification> notifications;
+    private Map<Integer, Notification> notificationRowMap;
     public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
     /**
      * Creates new form NotificationsPage
@@ -35,26 +40,40 @@ public class NotificationsPage extends javax.swing.JPanel{
         this.emp = employee;
         clearTable(jTable1);
         clearTable(jTable2);
-//        loadNotifications();
+        loadNotifications();
         loadInvites();
     }
-/*
+
     private void loadNotifications() {
         try {
-            List<Notification> notifications = EmployeeControl.getNotifications(emp);
+            notifications = EmployeeControl.getNotifications(emp);
+            notificationRowMap = new HashMap<>();
             
+            int rowNumber = 0;
             for(int i = 0; i < notifications.size(); i++) {
                 Object[] row = vectorizeNotification(notifications.get(i));
-                addRow(jTable1, row);
+                addRow(jTable2, row);
+                notificationRowMap.put(rowNumber, notifications.get(i));
             }
         } catch (SQLException e) {
             showMessage(DATABASE_ERROR_MESSAGE);
         }
     }
+    
+    private void removeNotification(int row) {
+        int oldSize = notificationRowMap.size();
+        notifications.remove(notificationRowMap.remove(row));
+        deleteRow(jTable2, row);
+        
+        for(int i = row + 1; i < oldSize; i++) {
+            notificationRowMap.put(i - 1, notificationRowMap.remove(i));
+        }
+    }
+    
     private Object[] vectorizeNotification(Notification notification) {
         return new Object[] { notification.getMessage() };
     }
-*/    
+    
     private void loadInvites(){
         try{
             int rowNumber = 0;
@@ -154,6 +173,11 @@ public class NotificationsPage extends javax.swing.JPanel{
         });
 
         jButton3.setText("Dismiss");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -238,9 +262,9 @@ public class NotificationsPage extends javax.swing.JPanel{
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void removeInvitation(int row) {
-        int oldSize = invitationRowMap.size();
-        Meeting meeting = invitationRowMap.remove(row);
-        invitations.remove(meeting);
+        deleteRow(jTable1, row);
+        int oldSize = invitationRowMap.size();       
+        invitations.remove(invitationRowMap.remove(row));
         
         for(int i = row + 1; i < oldSize; i++) {
             invitationRowMap.put(i - 1, invitationRowMap.remove(i));
@@ -264,6 +288,22 @@ public class NotificationsPage extends javax.swing.JPanel{
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // REMOVE NOTIFICATION
+        int[] selectedRows = jTable2.getSelectedRows();
+        
+        try {
+
+            for(int i = 0; i < selectedRows.length; i++) {
+                Notification notification = notificationRowMap.get(selectedRows[i]);
+                EmployeeControl.deleteNotification(notification);
+                removeNotification(selectedRows[i]);
+            }
+        } catch (SQLException e) {
+            showMessage("Database error while deleting notifications.");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

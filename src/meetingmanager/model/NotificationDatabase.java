@@ -59,7 +59,6 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
         );
     }
 
-    //1472064275520 | 1472067875520
     public void deleteNotification(Notification notification) throws SQLException {
         updateDatabase(
             "DELETE FROM notification WHERE "
@@ -69,9 +68,11 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
     }
     
     public List<Notification> getNotifications(Employee recipient) throws SQLException {
-        return queryDatabase(
+        String query = 
             "SELECT * FROM notification WHERE "
-            + keyValue(RECIPIENT, recipient.getLoginId())
+            + keyValue(RECIPIENT, recipient.getLoginId());
+        return queryDatabase(
+                query
         );
     }
 
@@ -84,6 +85,7 @@ public class NotificationDatabase extends DatabaseConnection<Notification> {
                     rs.getString(MESSAGE),
                     EmployeeDatabase.getInstance().getEmployee(rs.getString(RECIPIENT))
                 );
+                results.add(result);
             }
         } catch(EntityNotFoundException e) {
             
