@@ -104,12 +104,32 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
         );
     }
     
+    public void deleteMeeting(Meeting meeting) throws SQLException {
+        updateDatabase(
+            "DELETE FROM invitation_status WHERE "
+            + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
+            + keyValue(START_TIME, meeting.getStartTime()) + AND
+            + keyValue(END_TIME, meeting.getEndTime())
+        );
+    }
+    
+    public List<Employee> getAttendees(Meeting meeting) throws SQLException {
+        return queryDatabase(
+            "SELECT * FROM employee WHERE login_id IN (" +
+            "SELECT " + INVITEE + " FROM invitation_status WHERE "
+            + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
+            + keyValue(START_TIME, meeting.getStartTime()) + AND
+            + keyValue(END_TIME, meeting.getEndTime()) + AND
+            + keyValue(CONFIRMED, true) + ")"
+        ); 
+    }
+    
     public List<Employee> getDeclinedInvitees(Employee owner) throws SQLException {
         return queryDatabase(
             "SELECT * FROM employee WHERE login_id IN (" +
             "SELECT " + INVITEE + " FROM invitation_status WHERE "
             + keyValue(OWNER, owner.getLoginId()) + AND
-            + keyValue(CONFIRMED, false)
+            + keyValue(CONFIRMED, false) + ")"
         );
     }
     
