@@ -7,9 +7,12 @@ package userinterface;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Notification;
+import meetingmanager.entity.Meeting;
+import meetingmanager.entity.Room;
 import static meetingmanager.userinterface.UIUtils.*;
 
 /**
@@ -25,9 +28,12 @@ public class NotificationsPage extends javax.swing.JPanel{
     public NotificationsPage(Employee employee) {
         initComponents();
         this.emp = employee;
-        loadNotifications();
+        clearTable(jTable1);
+        clearTable(jTable2);
+//        loadNotifications();
+        loadInvites();
     }
-
+/*
     private void loadNotifications() {
         try {
             List<Notification> notifications = EmployeeControl.getNotifications(emp);
@@ -43,6 +49,29 @@ public class NotificationsPage extends javax.swing.JPanel{
     private Object[] vectorizeNotification(Notification notification) {
         return new Object[] { notification.getMessage() };
     }
+*/    
+    private void loadInvites(){
+        try{
+            Map<Meeting, Boolean> invites = EmployeeControl.getInvitedMeetings(emp);
+            for(Meeting meeting: invites.keySet()){
+                Boolean isUpdate = invites.get(meeting);
+                Employee owner = meeting.getOwner();
+                    System.out.println(owner.getName());
+                Room room = meeting.getLocation();
+                    System.out.println(room.getLocation());
+                Object[] row = vectorizeInvites(owner, room);
+                addRow(jTable1, row);
+            }            
+        }catch(SQLException e){
+            showMessage(DATABASE_ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    private Object[] vectorizeInvites(Employee e, Room r){
+        return new Object[] { "Invited by " + e.getName() + " at room: " + r.getLocation() };
+    }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

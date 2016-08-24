@@ -104,12 +104,12 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
         
         public Map<Meeting, Boolean> getUnconfirmedMeetings(Employee invitee) throws SQLException {
             String query = 
-               "SELECT m." + LOCATION + ", i." + START_TIME + ", i." + END_TIME + ", i." + OWNER + " "
+               "SELECT m." + LOCATION + ", i." + START_TIME + ", i." + END_TIME + ", i." + OWNER + ", i." + IS_UPDATE + " " 
                 + "FROM meeting AS m, invitation_status AS i "
                 + "WHERE "
-                + keyValue("m." + OWNER, "i." + OWNER) + AND
-                + keyValue("m." + START_TIME, "i." + START_TIME) + AND
-                + keyValue("m." + END_TIME, "i." + END_TIME) + AND
+                + columnEquals("m." + OWNER, "i." + OWNER) + AND
+                + columnEquals("m." + START_TIME, "i." + START_TIME) + AND
+                + columnEquals("m." + END_TIME, "i." + END_TIME) + AND
                 + "i." + CONFIRMED + " IS NULL";
             
             
@@ -139,6 +139,8 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
                     Boolean isUpdate = rs.getBoolean(IS_UPDATE);
                     updateMap.put(next, isUpdate);
                 }
+                
+                System.out.println("ResultSet Length: " + rs.getRow());
 
                 return updateMap;
             } catch(EntityNotFoundException e) {

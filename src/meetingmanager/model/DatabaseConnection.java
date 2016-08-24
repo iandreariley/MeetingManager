@@ -68,6 +68,10 @@ public abstract class DatabaseConnection<T> {
         protected String keyValue(String key, Date date) {
             return key + "=" + date.getTime();
         }
+        
+        protected String columnEquals(String col1, String col2) {
+            return col1 + "=" + col2;
+        }
 	
         protected String stringify(Date date) {
             return stringify(date.toString());
