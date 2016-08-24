@@ -60,7 +60,7 @@ public class NotificationsPage extends javax.swing.JPanel{
                 Room room = meeting.getLocation();
                     System.out.println(room.getLocation());
                 Object[] row = vectorizeInvites(owner, room);
-                addRow(jTable2, row);
+                addRow(jTable1, row);
             }            
         }catch(SQLException e){
             showMessage(DATABASE_ERROR_MESSAGE);
