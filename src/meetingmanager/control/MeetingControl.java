@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+import java.util.NavigableSet;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
@@ -25,6 +26,8 @@ import meetingmanager.model.RoomDatabase;
 import static meetingmanager.utils.Utils.*;
 
 public class MeetingControl {
+    
+    public static final int MAX_TIME_PER_ROOM = 10;
     
     public static void addMeeting(Meeting meeting, boolean isUpdate) throws SQLException {
         SortedSet<Employee> invitees = meeting.getInvited();
@@ -102,11 +105,11 @@ public class MeetingControl {
         combinedRoomAndEmployeeSchedule.addAll(inviteeSchedules);
         combinedRoomAndEmployeeSchedule.addAll(RoomScheduleDatabase.getInstance().getRoomSchedule(room));
         
-        return getAvailableRoomtimes(combinedRoomAndEmployeeSchedule, meetingDurationInHours);
+        return getAvailableRoomTimes(allTimesAfterNow(combinedRoomAndEmployeeSchedule), meetingDurationInHours);
     }
     
-    private static SortedSet<TimeSlot> getAvailableRoomtimes(TreeSet<TimeSlot> combinedRoomAndEmployeeSchedule, double meetingDurationInHours) {
-        SortedSet<TimeSlot> availableTimes = new TreeSet<>();
+    private static SortedSet<TimeSlot> getAvailableRoomTimes(NavigableSet<TimeSlot> combinedRoomAndEmployeeSchedule, double meetingDurationInHours) {
+        TreeSet<TimeSlot> availableTimes = new TreeSet<>();
         long meetingDurationInMilliseconds = hoursToMilliseconds(meetingDurationInHours);
         
         // If the schedule is empty, then make the room available now.
@@ -129,6 +132,11 @@ public class MeetingControl {
         availableTimes.add(newAvailableTime(previous.getEndTime(), meetingDurationInMilliseconds));
         
         return availableTimes;
+    }
+    
+    private static NavigableSet<TimeSlot> allTimesAfterNow(TreeSet<TimeSlot> schedule) {
+        TimeSlot now = new TimeSlot().setStartTime(now()).setEndTime(now());
+        return schedule.subSet(schedule.ceiling(now), true, schedule.last(), true);
     }
     
     private static TimeSlot newAvailableTime(Date startTime, long durationInMilliseconds) {

@@ -56,7 +56,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
     }
     
     private Object[] vectorizeEmployee(Employee employee) {
-        return new Object[] { employee.getName() };
+        return new Object[] { employee.getLoginId() };
     }
     
     /**
