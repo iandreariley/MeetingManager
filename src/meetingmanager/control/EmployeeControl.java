@@ -62,12 +62,8 @@ public class EmployeeControl {
     }
     
     public static Map<Meeting, Boolean> getInvitedMeetings(Employee employee) throws SQLException {
-        Map<Meeting, Boolean> map = MeetingDatabase.getInstance().getUnconfirmedMeetings(employee);
-        
-        for(Meeting meeting : map.keySet()) {
-            Boolean isupdate = map.get(meeting);
-        }
-        return map;
+        return MeetingDatabase.getInstance().getUnconfirmedMeetings(employee);
+                
     }
     
     public static List<Notification> getNotifications(Employee employee) throws SQLException {

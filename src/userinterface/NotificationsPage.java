@@ -30,10 +30,10 @@ public class NotificationsPage extends javax.swing.JPanel{
         this.emp = employee;
         clearTable(jTable1);
         clearTable(jTable2);
-        loadNotifications();
+//        loadNotifications();
         loadInvites();
     }
-
+/*
     private void loadNotifications() {
         try {
             List<Notification> notifications = EmployeeControl.getNotifications(emp);
@@ -49,25 +49,26 @@ public class NotificationsPage extends javax.swing.JPanel{
     private Object[] vectorizeNotification(Notification notification) {
         return new Object[] { notification.getMessage() };
     }
-    
+*/    
     private void loadInvites(){
         try{
             Map<Meeting, Boolean> invites = EmployeeControl.getInvitedMeetings(emp);
             for(Meeting meeting: invites.keySet()){
                 Boolean isUpdate = invites.get(meeting);
                 Employee owner = meeting.getOwner();
+                    System.out.println(owner.getName());
                 Room room = meeting.getLocation();
+                    System.out.println(room.getLocation());
                 Object[] row = vectorizeInvites(owner, room);
                 addRow(jTable2, row);
-            }
-            
+            }            
         }catch(SQLException e){
             showMessage(DATABASE_ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
     private Object[] vectorizeInvites(Employee e, Room r){
-        return new Object[] { "Invited by " + e + " at room: " + r };
+        return new Object[] { "Invited by " + e.getName() + " at room: " + r.getLocation() };
     }
     
     
