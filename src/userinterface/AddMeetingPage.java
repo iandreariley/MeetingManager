@@ -42,6 +42,22 @@ public class AddMeetingPage extends javax.swing.JPanel {
         return this;
     }
     
+    protected void addToSelected(Employee employee) {
+        addRow(jTable2, vectorizeEmployee(employee));
+    }
+    
+    protected void addToBench(Employee employee) {
+        addRow(jTable1, vectorizeEmployee(employee));
+    }
+    
+    protected void clearBench() {
+        clearTable(jTable1);
+    }
+    
+    protected void clearSelected() {
+        clearTable(jTable2);
+    }
+    
     private void loadEmployees() {
         try {
             List<Employee> employees = EmployeeControl.getAllEmployees();

@@ -192,22 +192,16 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // SELECT MEETING
-        int rowSelected = jTable1.getSelectedRow();
-        if(rowSelected < 0) {
+        selectMeeting();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    protected void selectMeeting() {
+        if(nothingSelected()) {
             showMessage("Please select a meeting first");
             return;
         } else {
-            Date startTime = (Date) jTable1.getValueAt(rowSelected, TIME);
-            Meeting meeting = new Meeting()
-                    .setLocation(findRoom((String) jTable1.getValueAt(rowSelected, LOCATION)))
-                    .setOwner(owner)
-                    .setInvited(invitees);
-                    
-            meeting.setTitle("test title");
-            meeting.setStartTime(startTime);
-            meeting.setEndTime(timeAfterInterval(startTime, durationInHours));
-            
             try {
+                Meeting meeting = getSelectedMeeting();
                 MeetingControl.addMeeting(meeting, false);
                 grandParent.refreshSchedule();
                 grandParent.refreshMeetings();
@@ -216,9 +210,27 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
                 showMessage("Database issue while adding meeting.");
                 e.printStackTrace();
             }
-        }  
-    }//GEN-LAST:event_jButton2ActionPerformed
+        } 
+    }
+    
+    protected boolean nothingSelected() {
+        return jTable1.getSelectedRow() < 0;
+    }
+    
+    protected Meeting getSelectedMeeting() {
+        int rowSelected = jTable1.getSelectedRow();
+        Date startTime = (Date) jTable1.getValueAt(rowSelected, TIME);
+        Meeting meeting = new Meeting()
+                .setLocation(findRoom((String) jTable1.getValueAt(rowSelected, LOCATION)))
+                .setOwner(owner)
+                .setInvited(invitees);
 
+        meeting.setTitle("test title");
+        meeting.setStartTime(startTime);
+        meeting.setEndTime(timeAfterInterval(startTime, durationInHours));
+        return meeting;
+    }
+    
     private Room findRoom(String location) {
         for (Room room : times.keySet())
             if(room.getLocation().equals(location))

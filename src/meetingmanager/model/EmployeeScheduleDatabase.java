@@ -66,6 +66,18 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
                 + keyValue(END_TIME, item.getEndTime())
             );
         }
+        
+        public void updateScheduleItemTime(Employee employee, TimeSlot oldItem, TimeSlot newItem) throws SQLException {
+            updateDatabase(
+                "UPDATE employee_schedule_line SET "
+                + keyValue(START_TIME, newItem.getStartTime()) + LINE_SEP
+                + keyValue(END_TIME, newItem.getEndTime())
+                + " WHERE "
+                + keyValue(EMPLOYEE, employee.getLoginId()) + AND
+                + keyValue(START_TIME, oldItem.getStartTime()) + AND
+                + keyValue(EMPLOYEE, oldItem.getEndTime())
+            );
+        }
 
         public List<TimeSlot> getEmployeeSchedule(Employee employee) throws SQLException {
             return queryDatabase(

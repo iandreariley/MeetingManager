@@ -412,6 +412,13 @@ public class EmployeePage extends javax.swing.JPanel {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // UPDATE MEETING BUTTON
+        if(jTable1.getSelectedRow() < 0)
+            return;
+        JFrame newFrame = new JFrame("Update Meeting");
+            newFrame.add(new UpdateMeetingPage(rowMap.get(jTable1.getSelectedRow())));
+            newFrame.pack();
+            newFrame.setVisible(true);
+        
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed

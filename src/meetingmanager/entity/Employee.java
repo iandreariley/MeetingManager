@@ -6,6 +6,15 @@ public class Employee extends ScheduledEntity {
 	private String loginId;
 	private String password;
 	private boolean isAdmin;
+        
+        public Employee(){}
+        
+        public Employee(Employee other) {
+            this.name = other.name;
+            this.loginId = other.loginId;
+            this.password = other.password;
+            this.isAdmin = other.isAdmin;
+        }
 	
 	public String getName() {
 		return name;
@@ -45,11 +54,19 @@ public class Employee extends ScheduledEntity {
         
         @Override
         public boolean equals(Object obj) {
-            try {
-                Employee employee = (Employee) obj;
-                return this.loginId.equals(employee.loginId);
-            } catch(ClassCastException e) {
+            if(this == obj)
+                return true;
+            if(obj == null || this.getClass() != obj.getClass())
                 return false;
-            }
+            
+            Employee other = (Employee) obj;
+            
+            return this.loginId == other.loginId || (this.loginId != null && this.loginId.equals(other.loginId));
+        }
+        
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            return 13 * hash + (loginId == null ? 0 : loginId.hashCode());
         }
 }

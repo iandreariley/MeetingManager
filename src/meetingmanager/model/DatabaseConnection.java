@@ -80,6 +80,10 @@ public abstract class DatabaseConnection<T> {
 	protected String stringify(String value) {
             return "'" + value + "'";
 	}
+        
+        protected String isNull(String field) {
+            return field + " IS NULL";
+        }
 	
 	protected void checkResultsNotEmpty(List<T> results) throws EntityNotFoundException {
 		if(results.isEmpty())

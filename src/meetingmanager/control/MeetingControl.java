@@ -59,8 +59,13 @@ public class MeetingControl {
         return new TreeSet<>(MeetingDatabase.getInstance().getOwnedMeetings(owner));
     } 
     
+    public static List<Employee> getInvited(Meeting meeting) throws SQLException {
+        return InvitationStatusDatabase.getInstance().getInvitees(meeting);
+    }
+    
     public static void deleteMeeting(Meeting meeting) throws SQLException {
         List<Employee> attending = InvitationStatusDatabase.getInstance().getAttendees(meeting);
+        attending.add(meeting.getOwner());
         Room location = meeting.getLocation();
         
         MeetingDatabase.getInstance().deleteMeeting(meeting);
@@ -75,6 +80,21 @@ public class MeetingControl {
             employeeScheduleDatabase.deleteEmployeeScheduleItem(attendee, meeting);
             notificationDatabase.addNotification(new Notification(message, attendee));
         }
+    }
+    
+    public static void updateMeeting(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
+        EmployeeScheduleDatabase employeeScheduleDatabase = EmployeeScheduleDatabase.getInstance();
+        InvitationStatusDatabase invitationStatusDatabase = InvitationStatusDatabase.getInstance();
+        List<Employee> attendees = invitationStatusDatabase.getAttendees(oldMeeting);
+        
+        employeeScheduleDatabase.updateScheduleItemTime(oldMeeting.getOwner(), oldMeeting, newMeeting);
+        invitationStatusDatabase.updateMeetingTime(oldMeeting, newMeeting);
+        invitationStatusDatabase.nullifyConfirmedAndSetUpdate(newMeeting);
+        
+        for(Employee invitee : attendees) {
+            employeeScheduleDatabase.deleteEmployeeScheduleItem(invitee, oldMeeting);
+        }
+        
     }
     
     public static void updateInviteeList(Set<Employee> original, Set<Employee> newList, Meeting meeting) throws SQLException {
@@ -223,7 +243,7 @@ public class MeetingControl {
     
     private static <T> Set<T> setDifference(Set<T> op1, Set<T> op2) {
         Set<T> difference = new HashSet<>(op1);
-        op1.removeAll(op2);
-        return op1;
+        difference.removeAll(op2);
+        return difference;
     }
 }

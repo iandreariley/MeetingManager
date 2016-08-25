@@ -94,6 +94,27 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
         );
     }
     
+    public void updateMeetingTime(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
+        updateDatabase(
+            "UPDATE invitation_status SET "
+            + keyValue(START_TIME, newMeeting.getStartTime()) + LINE_SEP
+            + keyValue(END_TIME, newMeeting.getEndTime())
+            + " WHERE "
+            + keyValue(OWNER, oldMeeting.getOwner().getLoginId()) + AND
+            + keyValue(START_TIME, oldMeeting.getStartTime()) + AND
+            + keyValue(END_TIME, oldMeeting.getEndTime())
+        );
+    }
+    
+    public void nullifyConfirmedAndSetUpdate(Meeting meeting) throws SQLException {
+        updateDatabase(
+           "UPDATE invitation_status SET confirmed=NULL, is_update=1 WHERE "
+            + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
+            + keyValue(START_TIME, meeting.getStartTime()) + AND
+            + keyValue(END_TIME, meeting.getEndTime())
+        );
+    }
+    
     public void deleteInvitationTime(Meeting meeting, Employee invitee) throws SQLException {
         updateDatabase(
             "DELETE FROM invitation_status WHERE "
@@ -122,6 +143,18 @@ public class InvitationStatusDatabase extends DatabaseConnection<Employee> {
             + keyValue(END_TIME, meeting.getEndTime()) + AND
             + keyValue(CONFIRMED, true) + ")"
         ); 
+    }
+    
+    public List<Employee> getInvitees(Meeting meeting) throws SQLException {
+        return queryDatabase(
+            "SELECT * FROM employee WHERE login_id IN (" +
+            "SELECT " + INVITEE + " FROM invitation_status WHERE "
+            + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
+            + keyValue(START_TIME, meeting.getStartTime()) + AND
+            + keyValue(END_TIME, meeting.getEndTime()) + AND
+            + "(" + keyValue(CONFIRMED, true) + " OR "
+            + isNull(CONFIRMED) + "))"
+        );
     }
     
     public List<Employee> getDeclinedInvitees(Employee owner) throws SQLException {
