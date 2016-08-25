@@ -88,7 +88,7 @@ public class MeetingControl {
         List<Employee> attendees = invitationStatusDatabase.getAttendees(oldMeeting);
         
         employeeScheduleDatabase.updateScheduleItemTime(oldMeeting.getOwner(), oldMeeting, newMeeting);
-        invitationStatusDatabase.updateMeetingTime(oldMeeting, newMeeting);
+        MeetingDatabase.getInstance().updateInvitationTime(oldMeeting, newMeeting.getStartTime(), newMeeting.getEndTime());
         invitationStatusDatabase.nullifyConfirmedAndSetUpdate(newMeeting);
         
         for(Employee invitee : attendees) {
