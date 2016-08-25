@@ -73,6 +73,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
     private void loadEmployees() {
         try {
             List<Employee> employees = EmployeeControl.getAllEmployees();
+            employees.remove(owner);
             
             for(int i = 0; i < employees.size(); i++) {
                 Object[] row = vectorizeEmployee(employees.get(i));
