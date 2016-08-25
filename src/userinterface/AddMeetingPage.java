@@ -255,7 +255,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
     
     protected String[] getSelectedEmployees() {
         int rowCount = jTable2.getRowCount();
-        String[] empArr = new String[rowCount+1];
+        String[] empArr = new String[rowCount];
         
         for(int i = 0; i < rowCount; i++){
             String empS = (String)jTable2.getValueAt(i, LOGIN_ID);
