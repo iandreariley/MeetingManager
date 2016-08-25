@@ -34,6 +34,7 @@ public class UIUtils {
     
     public static void clearTable(JTable table) {
         tableData(table).getDataVector().removeAllElements();
+        tableData(table).fireTableDataChanged();
     }
     
     public static void addRow(JTable table, Object[] row) {
