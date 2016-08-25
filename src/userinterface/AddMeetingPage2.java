@@ -37,17 +37,19 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
     private List<Employee> invitees;
     private Employee owner;
     private Map<Room,SortedSet<TimeSlot>> times;
+    private String title;
     private double durationInHours;
 
     /**
      * Creates new form AddMeetingPage2
      */
-    public AddMeetingPage2(String[] empArr, Employee owner) {
+    public AddMeetingPage2(String[] empArr, AddMeetingPage previous) {
         initComponents();
         clearTable(jTable1);
         this.invitees = loadEmployees(empArr);
-        this.owner = owner;
-        this.durationInHours = 1;
+        this.owner = previous.getOwner();
+        this.durationInHours = previous.getDuration();
+        this.title = previous.getTitle();
         this.times = loadMeetingTimes();
         loadTimeTable();
     }
@@ -223,7 +225,7 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
                 .setOwner(owner)
                 .setInvited(invitees);
 
-        meeting.setTitle("test title");
+        meeting.setTitle(title);
         meeting.setStartTime(startTime);
         meeting.setEndTime(timeAfterInterval(startTime, durationInHours));
         return meeting;

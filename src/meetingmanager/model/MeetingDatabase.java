@@ -25,6 +25,8 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
         public static final String CONFIRMED = "confirmed";
         public static final String IS_UPDATE = "is_update";
         public static final String INVITEE = "invitee";
+        public static final String TITLE = "title";
+        
         private static MeetingDatabase instance;
         
         static {
@@ -136,6 +138,7 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
                     Meeting next = new Meeting()
                         .setLocation(RoomDatabase.getInstance().getRoom(rs.getString(LOCATION)))
                         .setOwner(EmployeeDatabase.getInstance().getEmployee(rs.getString(OWNER)));
+                    next.setTitle(rs.getString(TITLE));
                     next.setStartTime(rs.getLong(START_TIME));
                     next.setEndTime(rs.getLong(END_TIME));
                     Boolean isUpdate = rs.getBoolean(IS_UPDATE);
@@ -171,6 +174,7 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
                     Meeting next = new Meeting()
                         .setLocation(RoomDatabase.getInstance().getRoom(rs.getString(LOCATION)))
                         .setOwner(EmployeeDatabase.getInstance().getEmployee(rs.getString(OWNER)));
+                    next.setTitle(rs.getString(TITLE));
                     next.setStartTime(rs.getLong(START_TIME));
                     next.setEndTime(rs.getLong(END_TIME));
                     results.add(next);

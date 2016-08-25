@@ -22,8 +22,8 @@ public class UpdateMeetingPage2 extends AddMeetingPage2 {
     Set<Employee> newList;
     Meeting meeting;
     
-    public UpdateMeetingPage2(String[] originalLogins, Set<Employee> original, Set<Employee> newList, Meeting meeting) {
-        super(originalLogins, meeting.getOwner());
+    public UpdateMeetingPage2(String[] originalLogins, UpdateMeetingPage previous, Set<Employee> original, Set<Employee> newList, Meeting meeting) {
+        super(originalLogins, previous);
         this.original = original;
         this.meeting = meeting;
         this.newList = newList;

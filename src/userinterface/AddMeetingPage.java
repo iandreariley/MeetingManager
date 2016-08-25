@@ -58,6 +58,18 @@ public class AddMeetingPage extends javax.swing.JPanel {
         clearTable(jTable2);
     }
     
+    public String getTitle() {
+        return jTextField1.getText();
+    }
+    
+    public Employee getOwner() {
+        return owner;
+    }
+    
+    public double getDuration() {
+        return Double.parseDouble(jTextField2.getText());
+    }
+    
     private void loadEmployees() {
         try {
             List<Employee> employees = EmployeeControl.getAllEmployees();
@@ -233,7 +245,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
     protected void moveToNextWindow() {
         String[] empArr =  getSelectedEmployees();
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
-        topFrame.add(new AddMeetingPage2(empArr, owner).setGrandParent(parent));
+        topFrame.add(new AddMeetingPage2(empArr, this).setGrandParent(parent));
         AddMeetingPage.this.setVisible(false);
     }
     

@@ -90,7 +90,7 @@ public class UpdateMeetingPage extends AddMeetingPage {
             if(!changeTimeAndLocation(newInviteeList))
                 return;
             
-            getMainWindow().add(new UpdateMeetingPage2(employeeLogins, invited, newInviteeList, meeting));
+            getMainWindow().add(new UpdateMeetingPage2(employeeLogins, this, invited, newInviteeList, meeting));
             this.setVisible(false);
         } catch (SQLException e) {
             showMessage("Database error while trying to get employee list.");
