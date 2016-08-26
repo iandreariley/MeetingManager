@@ -7,14 +7,10 @@ package userinterface;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import meetingmanager.control.MeetingControl;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.entity.Employee;
-import meetingmanager.entity.Notification;
-import meetingmanager.entity.TimeSlot;
 import static meetingmanager.userinterface.UIUtils.*;
 
 /**

@@ -222,7 +222,11 @@ public class MeetingControl {
     }
     
     private static NavigableSet<TimeSlot> allTimesAfterNow(TreeSet<TimeSlot> schedule) {
-        return schedule.subSet(schedule.ceiling(timeSlotForCurrentInstant()), true, schedule.last(), true);
+        TimeSlot start = schedule.ceiling(timeSlotForCurrentInstant());
+        if(start == null)
+            return new TreeSet<>();
+        else
+            return schedule.subSet(schedule.ceiling(timeSlotForCurrentInstant()), true, schedule.last(), true);
     }
     
     private static TimeSlot newAvailableTime(Date startTime, long durationInMilliseconds) {
