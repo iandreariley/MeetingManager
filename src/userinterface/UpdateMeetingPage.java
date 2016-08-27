@@ -78,7 +78,7 @@ public class UpdateMeetingPage extends AddMeetingPage {
     protected void moveToNextWindow() {                                         
         // AFTER USERS ARE SELECTED, MOVE TO NEXT WINDOW TO SELECT ROOM
         try {
-            String[] employeeLogins = getSelectedEmployees();
+            String[] employeeLogins = getSelectedEmployeeIds();
             Set<Employee> newInviteeList = new HashSet<>(MeetingControl.getEmployees(employeeLogins));
             MeetingControl.updateInviteeList(invited, newInviteeList, meeting);
             if(!changeTimeAndLocation(newInviteeList))

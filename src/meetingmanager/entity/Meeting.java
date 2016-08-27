@@ -1,5 +1,6 @@
 package meetingmanager.entity;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.SortedSet;
@@ -75,6 +76,12 @@ public class Meeting extends TimeSlot {
 		this.invited = invited;
 		return this;
 	}
+        
+        public Meeting setInvited(Employee... employees) {
+            this.invited = new TreeSet<>(ALPHA_EMPLOYEE_SORTER);
+            this.invited.addAll(Arrays.asList(employees));
+            return this;
+        }
         
         public Meeting setInvited(Collection<Employee> invited) {
             

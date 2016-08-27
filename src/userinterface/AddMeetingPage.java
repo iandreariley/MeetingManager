@@ -6,7 +6,11 @@
 package userinterface;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import meetingmanager.control.EmployeeControl;
@@ -24,6 +28,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
     
     protected EmployeePage parent;
     protected Employee owner;
+    private Map<String, Employee> employeeMap;
 
     public AddMeetingPage(Employee owner, EmployeePage parent) {
         initComponents();
@@ -91,10 +96,12 @@ public class AddMeetingPage extends javax.swing.JPanel {
     private void loadEmployees() {
         try {
             List<Employee> employees = EmployeeControl.getAllEmployees();
+            employeeMap = new HashMap<>();
             employees.remove(owner);
             
-            for(int i = 0; i < employees.size(); i++) {
-                Object[] row = vectorizeEmployee(employees.get(i));
+            for(Employee employee : employees) {
+                employeeMap.put(employee.getLoginId(), employee);
+                Object[] row = vectorizeEmployee(employee);
                 addRow(jTable1, row);
             }
         } catch (SQLException e) {
@@ -261,14 +268,33 @@ public class AddMeetingPage extends javax.swing.JPanel {
         moveToNextWindow();
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    public Employee[] getSelectedEmployees() {
+        String[] selectedIds = getSelectedEmployeeIds();
+        Employee[] selected = new Employee[selectedIds.length];
+        
+        for(int i = 0; i < selectedIds.length; i++) {
+            selected[i] = employeeMap.get(selectedIds[i]);
+        }
+        
+        return selected;
+    }
     protected void moveToNextWindow() {
         if (noDuration() || noTitle()) {
             return;
         }
-        String[] empArr =  getSelectedEmployees();
+        String[] empArr =  getSelectedEmployeeIds();
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
-        topFrame.add(new AddMeetingPage2(empArr, this).setGrandParent(parent));
-        AddMeetingPage.this.setVisible(false);
+        //topFrame.add(new AddMeetingPage2(empArr, this).setGrandParent(parent));
+        try {
+            topFrame.add(new SelectTimePage(this));
+            this.setVisible(false);
+        } catch (SQLException e) {
+            showMessage("SQL error while loading times");
+        }
+    }
+    
+    public int getHeadCount() {
+        return jTable2.getRowCount();
     }
     
     private boolean noTitle() {
@@ -298,7 +324,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
         return (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
     }
     
-    protected String[] getSelectedEmployees() {
+    protected String[] getSelectedEmployeeIds() {
         int rowCount = jTable2.getRowCount();
         String[] empArr = new String[rowCount];
         
@@ -308,6 +334,11 @@ public class AddMeetingPage extends javax.swing.JPanel {
         }
         
         return empArr;
+    }
+    
+    public void refreshMainPage() {
+        parent.refreshMeetings();
+        parent.refreshSchedule();
     }
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

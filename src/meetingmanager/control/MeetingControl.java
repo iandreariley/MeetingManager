@@ -157,6 +157,11 @@ public class MeetingControl {
         return timesByRoom;
     }
     
+    public static SortedSet<TimeSlot> getCoincidingEmployeeTimes(double meetingDurationInHours, Employee... invitees) throws SQLException {
+        TreeSet<TimeSlot> schedule = getCombinedSchedule(invitees);
+        return getAvailableTimes(schedule, meetingDurationInHours);
+    }
+    
     private static TreeSet<TimeSlot> getCombinedSchedule(Employee... invitees) throws SQLException {
         TreeSet<TimeSlot> combinedSchedule = new TreeSet<>();
         EmployeeScheduleDatabase schedules = EmployeeScheduleDatabase.getInstance();
@@ -168,27 +173,38 @@ public class MeetingControl {
         return combinedSchedule;
     }
     
+    public static Set<Room> getAvailableRooms(TimeSlot time, int capacity) throws SQLException {
+        Set<Room> rooms = new HashSet<>(RoomDatabase.getInstance().getAllRooms());
+        
+        for(Room room : rooms) {
+            if (room.getCapacity() < capacity || !room.isAvailable(time))
+                rooms.remove(room);
+        }
+        
+        return rooms;
+    }
+    
     private static SortedSet<TimeSlot> getAvailableRoomTimes(Room room, TreeSet<TimeSlot> inviteeSchedules, double meetingDurationInHours) throws SQLException {
         TreeSet<TimeSlot> combinedRoomAndEmployeeSchedule = new TreeSet<>();
         combinedRoomAndEmployeeSchedule.addAll(inviteeSchedules);
         combinedRoomAndEmployeeSchedule.addAll(RoomScheduleDatabase.getInstance().getRoomSchedule(room));
         
-        return getAvailableRoomTimes(allTimesAfterNow(combinedRoomAndEmployeeSchedule), meetingDurationInHours);
+        return getAvailableTimes(allTimesAfterNow(combinedRoomAndEmployeeSchedule), meetingDurationInHours);
     }
     
     /**
-     * Precondition combinedRoomAndEmployeeSchedule must have at least one timeslot with an endtime equivalent to now.
+     * Precondition schedule must have at least one timeslot with an endtime equivalent to now.
      * Look at "allTimesAfterNow" for reference.
-     * @param combinedRoomAndEmployeeSchedule
+     * @param schedule
      * @param meetingDurationInHours
      * @return 
      */
-    private static SortedSet<TimeSlot> getAvailableRoomTimes(NavigableSet<TimeSlot> combinedRoomAndEmployeeSchedule, double meetingDurationInHours) {
+    private static SortedSet<TimeSlot> getAvailableTimes(NavigableSet<TimeSlot> schedule, double meetingDurationInHours) {
         TreeSet<TimeSlot> availableTimes = new TreeSet<>();
         long meetingDurationInMilliseconds = hoursToMilliseconds(meetingDurationInHours);
         TimeSlot previous = timeSlotForCurrentInstant();
         
-        for(TimeSlot next : combinedRoomAndEmployeeSchedule) {
+        for(TimeSlot next : schedule) {
             long timeBetweenEvents = elapsedTime(previous.getEndTime(), next.getStartTime());
             Date startTime = previous.getEndTime();
             
