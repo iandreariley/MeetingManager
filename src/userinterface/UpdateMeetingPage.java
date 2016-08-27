@@ -39,9 +39,11 @@ public class UpdateMeetingPage extends AddMeetingPage {
         };
     }
     
-    UpdateMeetingPage(Meeting meeting) {
-        super(meeting.getOwner());
+    UpdateMeetingPage(Meeting meeting, EmployeePage parent) {
+        super(meeting.getOwner(), parent);
         this.meeting = meeting;
+        setDuration(meeting.getDuration());
+        setTitle(meeting.getTitle());
         loadInvited();
         clearSelected();
         clearBench();
@@ -72,14 +74,6 @@ public class UpdateMeetingPage extends AddMeetingPage {
         }
     }
     
-    private boolean lameSearch(Employee needle, Set<Employee> haystack) {
-        for(Employee emp : haystack) {
-            if(emp.getLoginId().equals(needle.getLoginId()))
-                return true;
-        }
-        return false;
-    }
-    
     @Override
     protected void moveToNextWindow() {                                         
         // AFTER USERS ARE SELECTED, MOVE TO NEXT WINDOW TO SELECT ROOM
@@ -90,7 +84,10 @@ public class UpdateMeetingPage extends AddMeetingPage {
             if(!changeTimeAndLocation(newInviteeList))
                 return;
             
-            getMainWindow().add(new UpdateMeetingPage2(employeeLogins, this, invited, newInviteeList, meeting));
+            UpdateMeetingPage2 nextPage = new UpdateMeetingPage2(employeeLogins, this, invited, newInviteeList, meeting);
+            nextPage.setGrandParent(parent);
+            
+            getMainWindow().add(nextPage);
             this.setVisible(false);
         } catch (SQLException e) {
             showMessage("Database error while trying to get employee list.");
@@ -102,8 +99,10 @@ public class UpdateMeetingPage extends AddMeetingPage {
     }
     
     private boolean changeTimeAndLocation(Set<Employee> newInviteeList) {
-        if(MeetingControl.conflictsExist(newInviteeList, meeting))
+        if(MeetingControl.conflictsExist(newInviteeList, meeting)){
+            showMessage("One or more employees can't make the original meeting time. Please choose a new time");
             return true;
+        }
         
         return warn("Would you like to change the meeting time as well?");
     }

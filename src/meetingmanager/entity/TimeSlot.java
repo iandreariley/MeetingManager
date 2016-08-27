@@ -22,6 +22,13 @@ public class TimeSlot implements Comparable<TimeSlot> {
             this.isVisible = other.isVisible;
             this.title = other.title;
         }
+        
+        public long getDuration() {
+            if(startTime == null || endTime == null)
+                return 0;
+            
+            return endTime.getTime() - startTime.getTime();
+        }
 
 	public boolean overlaps(TimeSlot other) {
 		if (overlaps(this, other) || overlaps(other, this))

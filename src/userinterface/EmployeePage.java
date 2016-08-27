@@ -334,7 +334,7 @@ public class EmployeePage extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         JFrame newFrame = new JFrame("Create a Meeting");
-        newFrame.add(new AddMeetingPage(emp).setParent(this));
+        newFrame.add(new AddMeetingPage(emp, this));
         newFrame.pack();
         newFrame.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -427,7 +427,7 @@ public class EmployeePage extends javax.swing.JPanel {
         if(jTable1.getSelectedRow() < 0)
             return;
         JFrame newFrame = new JFrame("Update Meeting");
-            newFrame.add(new UpdateMeetingPage(rowMap.get(jTable1.getSelectedRow())));
+            newFrame.add(new UpdateMeetingPage(rowMap.get(jTable1.getSelectedRow()), this));
             newFrame.pack();
             newFrame.setVisible(true);
         

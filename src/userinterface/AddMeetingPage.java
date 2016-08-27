@@ -25,12 +25,21 @@ public class AddMeetingPage extends javax.swing.JPanel {
     protected EmployeePage parent;
     protected Employee owner;
 
-    public AddMeetingPage(Employee owner) {
+    public AddMeetingPage(Employee owner, EmployeePage parent) {
         initComponents();
         clearTable(jTable1);
         clearTable(jTable2);
         this.owner = owner;
+        this.parent = parent;
         loadEmployees();
+    }
+    
+    public final void hideTextFields() {
+        jTextField1.setVisible(false);
+        jTextField2.setVisible(false);
+        jLabel2.setVisible(false);
+        jLabel3.setVisible(false);
+        
     }
     
     public AddMeetingPage setParent(EmployeePage parent) {
@@ -62,8 +71,21 @@ public class AddMeetingPage extends javax.swing.JPanel {
         return owner;
     }
     
+    protected void setDuration(long millis) {
+        Double hours = (double) millis / (double) 3600000;
+        jTextField2.setText(hours.toString());
+    }
+    
+    protected void setTitle(String title) {
+        jTextField1.setText(title);
+    }
+    
     public double getDuration() {
-        return Double.parseDouble(jTextField2.getText());
+        try {
+            return Double.parseDouble(jTextField2.getText());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
     
     private void loadEmployees() {

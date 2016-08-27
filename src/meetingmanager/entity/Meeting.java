@@ -24,6 +24,13 @@ public class Meeting extends TimeSlot {
             };
         }
 	
+        public Meeting(Meeting otherMeeting) {
+            super(otherMeeting);
+            this.attending = attending;
+            this.invited = invited;
+            this.owner = owner;
+            this.location = location;
+        }
         
 	public Meeting() {
 		super();

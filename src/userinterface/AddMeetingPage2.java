@@ -33,24 +33,22 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
     public static final int LOCATION = 0;
     public static final int TIME = 1;
     
-    private EmployeePage grandParent;
-    private List<Employee> invitees;
-    private Employee owner;
+    protected EmployeePage grandParent;
+    protected AddMeetingPage parent;
+    protected List<Employee> invitees;
+    protected Employee owner;
     private Map<Room,SortedSet<TimeSlot>> times;
-    private String title;
-    private double durationInHours;
 
     /**
      * Creates new form AddMeetingPage2
      */
-    public AddMeetingPage2(String[] empArr, AddMeetingPage previous) {
+    public AddMeetingPage2(String[] empArr, AddMeetingPage parent) {
         initComponents();
         clearTable(jTable1);
+        this.parent = parent;
         this.invitees = loadEmployees(empArr);
-        this.owner = previous.getOwner();
-        this.durationInHours = previous.getDuration();
-        this.title = previous.getTitle();
-        this.times = loadMeetingTimes();
+        this.owner = parent.getOwner();
+        this.times = loadMeetingTimes(null);
         loadTimeTable();
     }
     
@@ -78,9 +76,9 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
         return allAttendees.toArray(new Employee[allAttendees.size()]);
     }
     
-    private Map<Room, SortedSet<TimeSlot>> loadMeetingTimes() {
+    protected Map<Room, SortedSet<TimeSlot>> loadMeetingTimes(Meeting meeting) {
         try {
-            return MeetingControl.getCoincidingTimes(durationInHours, attendeesAsArray());
+            return MeetingControl.getCoincidingTimes(parent.getDuration(), attendeesAsArray());
         } catch (SQLException e) {
             showMessage("Uh oh, something went wrong when trying to compile meeting times.");
             e.printStackTrace();
@@ -186,7 +184,7 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
         // TODO add your handling code here:
         
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage2.this);
-        topFrame.add(new AddMeetingPage(owner));
+        topFrame.add(new AddMeetingPage(owner, grandParent));
         AddMeetingPage2.this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -214,7 +212,23 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
     }
     
     protected boolean nothingSelected() {
-        return jTable1.getSelectedRow() < 0;
+        return getSelectedRow() < 0;
+    }
+    
+    protected int getSelectedRow() {
+        return jTable1.getSelectedRow();
+    }
+    
+    protected Date getSelectedTime() {
+        if(nothingSelected())
+            return null;
+        return (Date) jTable1.getValueAt(getSelectedRow(), TIME);
+    }
+    
+    protected Room getSelectedLocation() {
+        if(nothingSelected())
+            return null;
+        return findRoom((String) jTable1.getValueAt(getSelectedRow(), LOCATION));
     }
     
     protected Meeting getSelectedMeeting() {
@@ -225,9 +239,9 @@ public class AddMeetingPage2 extends javax.swing.JPanel {
                 .setOwner(owner)
                 .setInvited(invitees);
 
-        meeting.setTitle(title);
+        meeting.setTitle(parent.getTitle());
         meeting.setStartTime(startTime);
-        meeting.setEndTime(timeAfterInterval(startTime, durationInHours));
+        meeting.setEndTime(timeAfterInterval(startTime, parent.getDuration()));
         return meeting;
     }
     
