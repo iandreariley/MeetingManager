@@ -117,6 +117,14 @@ public class TimeSlot implements Comparable<TimeSlot> {
         }
         
         @Override
+        public int hashCode() {
+            int hash = 11;
+            hash = 19 * hash + (startTime == null ? 0 : startTime.hashCode());
+            hash = 19 * hash + (endTime == null ? 0 : endTime.hashCode());
+            return hash;
+        }
+        
+        @Override
         public String toString() {
             return title + " " + startTime + " to " + endTime;
         }

@@ -1,7 +1,6 @@
 package meetingmanager.control;
 
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.TreeSet;
 import java.util.SortedSet;
 import java.util.Map;
@@ -16,7 +15,6 @@ import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Notification;
-import meetingmanager.entity.ScheduledEntity;
 import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.InviteeNotFoundException;
 import meetingmanager.model.EmployeeDatabase;

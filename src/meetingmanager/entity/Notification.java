@@ -28,4 +28,28 @@ public class Notification {
     public String getMessage() {
         return message;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj)
+            return true;
+        if(obj == null || this.getClass() != obj.getClass())
+            return false;
+
+        Notification other = (Notification) obj;
+
+        return
+            (this.message == other.message || other != null && other.message.equals(this.message)) &&
+            (this.recipient == other.recipient || other != null && other.recipient.equals(this.recipient));
+    }
+    
+    
+        
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + (message == null ? 0 : message.hashCode());
+        hash = 17 * hash + (recipient == null ? 0 : recipient.hashCode());
+        return hash;
+    }
 }

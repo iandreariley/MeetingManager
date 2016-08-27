@@ -37,19 +37,42 @@ public class Tester {
 	private static TimeSlot timeslot3;
 
 	public static void main(String[] args) {
-//		createTestTimeSlots();
+		createTestTimeSlots();
 //		runTimeSlotTest();
 //		runScheduleTest();
 //		runDBTest();
 //                runAdminControlTest();
 //                runEmployeeControlTest();
 //                runMeetingControlTest();
+
+            Employee testEmp = testEmp();
+            
+            TimeSlot testSlot = new TimeSlot()
+                    .setStartTime(new Date(0))
+                    .setEndTime(new Date(1000 * 60 * 60));  
+            
+            Meeting m1 = new Meeting().setOwner(testEmp);
+            Meeting m2 = new Meeting().setOwner(testEmp2());
+            
+            
+            m1
+                    .setStartTime(new Date(0))
+                    .setEndTime(new Date(1000 * 60 * 70));  
+            
+            m2
+                    .setStartTime(new Date(0))
+                    .setEndTime(new Date(1000 * 60 * 60));
+            
+            System.out.println(m1.equals(m2));
+            System.out.println(m1.equals(testSlot));
+            System.out.println(m2.equals(testSlot));
+            
                 
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                createAndShowGUI();
-            }
-        });
+            SwingUtilities.invokeLater(new Runnable(){
+                public void run(){
+                    createAndShowGUI();
+                }
+            });
                 
 	}
 	
@@ -340,6 +363,16 @@ public class Tester {
 		testOverlap(timeslot2, timeslot3, false);
 		testOverlap(timeslot3, timeslot2, false);
 	}
+        
+        private static Meeting createTestMeeting() {
+            Calendar st1 = newDate(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            Calendar et1 = newDate(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+            Employee owner = testEmp();
+            Meeting meeting = new Meeting().setOwner(owner);
+            meeting.setStartTime(st1.getTime());
+            meeting.setEndTime(et1.getTime());
+            return meeting;
+        }
 	
 	private static void createTestTimeSlots() {
 		Calendar st1 = newDate(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);

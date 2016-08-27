@@ -24,6 +24,7 @@ public class Meeting extends TimeSlot {
         };
     }
 	
+        
 	public Meeting() {
 		super();
 	}
@@ -92,4 +93,19 @@ public class Meeting extends TimeSlot {
 		this.owner = owner;
 		return this;
 	}
+    
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj)
+            return true;
+        if(obj == null)
+            return false;
+        if (obj instanceof Meeting) {
+            Meeting other = (Meeting) obj;
+            return super.equals(obj) &&
+                (this.owner == other.owner || other.owner != null  && other.owner.equals(this.owner));
+        } else { // check whether it is a timeslot
+            return super.equals(obj);
+        }
+    }
 }

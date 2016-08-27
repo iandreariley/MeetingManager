@@ -56,6 +56,7 @@ public class NotificationsPage extends javax.swing.JPanel{
                 Object[] row = vectorizeNotification(notifications.get(i));
                 addRow(jTable2, row);
                 notificationRowMap.put(rowNumber, notifications.get(i));
+                rowNumber++;
             }
         } catch (SQLException e) {
             showMessage(DATABASE_ERROR_MESSAGE);
@@ -64,11 +65,13 @@ public class NotificationsPage extends javax.swing.JPanel{
     
     private void removeNotification(int row) {
         int oldSize = notificationRowMap.size();
-        notifications.remove(notificationRowMap.remove(row));
+        Notification notification = notificationRowMap.remove(row);
+        notifications.remove(notification);
         deleteRow(jTable2, row);
         
         for(int i = row + 1; i < oldSize; i++) {
-            notificationRowMap.put(i - 1, notificationRowMap.remove(i));
+            Notification next = notificationRowMap.remove(i);
+            notificationRowMap.put(i - 1, next);
         }
     }
     
@@ -88,6 +91,7 @@ public class NotificationsPage extends javax.swing.JPanel{
                 Object[] row = vectorizeInvites(owner, room, meeting);
                 invitationRowMap.put(rowNumber, meeting);
                 addRow(jTable1, row);
+                rowNumber++;
             }
             
         } catch (SQLException e){
@@ -256,11 +260,13 @@ public class NotificationsPage extends javax.swing.JPanel{
 
     private void removeInvitation(int row) {
         deleteRow(jTable1, row);
-        int oldSize = invitationRowMap.size();       
-        invitations.remove(invitationRowMap.remove(row));
+        int oldSize = invitationRowMap.size();
+        Meeting meeting = invitationRowMap.remove(row);
+        invitations.remove(meeting);
         
         for(int i = row + 1; i < oldSize; i++) {
-            invitationRowMap.put(i - 1, invitationRowMap.remove(i));
+            Meeting next = invitationRowMap.remove(i);
+            invitationRowMap.put(i - 1, next);
         }
         
     }//GEN-LAST:event_jButton1ActionPerformed
