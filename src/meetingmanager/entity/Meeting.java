@@ -16,13 +16,13 @@ public class Meeting extends TimeSlot {
 	private SortedSet<Employee> attending;
 	private Employee owner;
         
-    static {
-        ALPHA_EMPLOYEE_SORTER = new Comparator<Employee>(){
-            public int compare(Employee e1, Employee e2) {
-                return e1.getName().compareTo(e2.getName());
-            }
-        };
-    }
+        static {
+            ALPHA_EMPLOYEE_SORTER = new Comparator<Employee>(){
+                public int compare(Employee e1, Employee e2) {
+                    return e1.getName().compareTo(e2.getName());
+                }
+            };
+        }
 	
         
 	public Meeting() {

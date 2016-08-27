@@ -75,7 +75,7 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
                 + " WHERE "
                 + keyValue(EMPLOYEE, employee.getLoginId()) + AND
                 + keyValue(START_TIME, oldItem.getStartTime()) + AND
-                + keyValue(EMPLOYEE, oldItem.getEndTime())
+                + keyValue(END_TIME, oldItem.getEndTime())
             );
         }
 
