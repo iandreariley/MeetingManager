@@ -53,6 +53,7 @@ public class AdminPage extends javax.swing.JPanel {
         clearTable(jTable2);
         loadUsers();
         loadRooms();
+        jLabel2.setText("Welcome, " + user.getName() );
     }
     
     private void loadUsers() {
@@ -115,6 +116,7 @@ public class AdminPage extends javax.swing.JPanel {
         jButton7 = new javax.swing.JButton();
         jTextField3 = new javax.swing.JTextField();
         jTextField4 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
 
         jLabel1.setText("Admin Page");
 
@@ -194,6 +196,8 @@ public class AdminPage extends javax.swing.JPanel {
             }
         });
 
+        jLabel2.setText("jLabel2");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -205,7 +209,8 @@ public class AdminPage extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(188, 188, 188)
+                                .addComponent(jLabel2)
+                                .addGap(154, 154, 154)
                                 .addComponent(jLabel1)))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -240,7 +245,8 @@ public class AdminPage extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
-                            .addComponent(jButton4))
+                            .addComponent(jButton4)
+                            .addComponent(jLabel2))
                         .addGap(17, 17, 17)
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -384,6 +390,7 @@ public class AdminPage extends javax.swing.JPanel {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;

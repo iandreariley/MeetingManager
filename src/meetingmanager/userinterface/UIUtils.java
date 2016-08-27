@@ -22,8 +22,8 @@ public class UIUtils {
     public static boolean warn(String message) {
         return JOptionPane.showOptionDialog(
             null,
-            "Warning",
-            message,
+            message,    
+            "Warning",            
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE,
             null,

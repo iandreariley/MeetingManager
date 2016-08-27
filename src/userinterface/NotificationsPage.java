@@ -32,16 +32,18 @@ public class NotificationsPage extends javax.swing.JPanel{
     private List<Notification> notifications;
     private Map<Integer, Notification> notificationRowMap;
     public String DATABASE_ERROR_MESSAGE = "Something went terribly wrong with the database. Whoops.";
+    private EmployeePage parent;
     /**
      * Creates new form NotificationsPage
      */
-    public NotificationsPage(Employee employee) {
+    public NotificationsPage(Employee employee, EmployeePage parent) {
         initComponents();
         this.emp = employee;
         clearTable(jTable1);
         clearTable(jTable2);
         loadNotifications();
         loadInvites();
+        this.parent = parent;
     }
 
     private void loadNotifications() {
@@ -83,7 +85,7 @@ public class NotificationsPage extends javax.swing.JPanel{
             for(Meeting meeting: invitations.keySet()){
                 Employee owner = meeting.getOwner();
                 Room room = meeting.getLocation();
-                Object[] row = vectorizeInvites(owner, room);
+                Object[] row = vectorizeInvites(owner, room, meeting);
                 invitationRowMap.put(rowNumber, meeting);
                 addRow(jTable1, row);
             }
@@ -93,8 +95,8 @@ public class NotificationsPage extends javax.swing.JPanel{
             e.printStackTrace();
         }
     }
-    private Object[] vectorizeInvites(Employee e, Room r){
-        return new Object[] { "Invited by " + e.getName() + " at room: " + r.getLocation() };
+    private Object[] vectorizeInvites(Employee e, Room r, Meeting m){
+        return new Object[] { "Invited by " + e.getName() + " at room: " + r.getLocation(), e.getName(), m.getStartTime(), m.getEndTime() };
     }
     
     
@@ -190,15 +192,20 @@ public class NotificationsPage extends javax.swing.JPanel{
                         .addComponent(jButton2))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(23, 23, 23)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 851, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 851, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(22, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(446, 446, 446)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(53, 53, 53)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel1)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(32, 32, 32)
-                        .addComponent(jButton3)))
-                .addContainerGap(22, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2)
+                        .addGap(18, 18, 18)))
+                .addComponent(jButton3)
+                .addGap(53, 53, 53))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -210,12 +217,11 @@ public class NotificationsPage extends javax.swing.JPanel{
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(8, 8, 8)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(46, 46, 46))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)
-                        .addGap(92, 92, 92)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(34, 34, 34)
+                        .addComponent(jButton3)))
+                .addGap(46, 46, 46)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -238,6 +244,7 @@ public class NotificationsPage extends javax.swing.JPanel{
             MeetingControl.acceptInvitation(meeting, emp);
             removeInvitation(row);
             showMessage("Thank you! You are now attending " + meeting.getTitle());
+            parent.refreshSchedule();
         } catch (SQLException e) {
             showMessage("Database error while trying to accept invitation.");
             e.printStackTrace();
