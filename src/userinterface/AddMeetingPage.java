@@ -262,10 +262,36 @@ public class AddMeetingPage extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     protected void moveToNextWindow() {
+        if (noDuration() || noTitle()) {
+            return;
+        }
         String[] empArr =  getSelectedEmployees();
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(AddMeetingPage.this);
         topFrame.add(new AddMeetingPage2(empArr, this).setGrandParent(parent));
         AddMeetingPage.this.setVisible(false);
+    }
+    
+    private boolean noTitle() {
+        if(jTextField1.getText().isEmpty()) {
+            showMessage("Please enter a title for the meeting before continuing");
+            return true;            
+        }
+        return false;
+    }
+    
+    private boolean noDuration() {
+        if(jTextField2.getText().isEmpty()) {            
+            showMessage("Please enter a duration for the meeting in hours.");
+            return true;
+        }
+        
+        try {
+            Double.valueOf(jTextField2.getText());
+            return false;
+        } catch (NumberFormatException e) {
+            showMessage("Duration must be a valid number.");
+            return true;
+        }
     }
     
     protected JFrame getMainWindow() {
