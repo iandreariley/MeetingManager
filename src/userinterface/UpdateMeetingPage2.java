@@ -38,7 +38,7 @@ public class UpdateMeetingPage2 extends AddMeetingPage2 {
             return;
         try{
             Meeting newMeeting = getSelectedMeeting();
-            MeetingControl.updateMeeting(meeting, newMeeting);
+            MeetingControl.updateMeetingTime(meeting, newMeeting);
             grandParent.refreshSchedule();
             grandParent.refreshMeetings();
             showMessage("Meeting updated!");

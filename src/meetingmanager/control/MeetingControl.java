@@ -81,6 +81,11 @@ public class MeetingControl {
     }
     
     public static void updateMeeting(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
+        updateMeetingTime(oldMeeting, newMeeting);
+        MeetingDatabase.getInstance().updateLocation(newMeeting);
+    }
+    
+    public static void updateMeetingTime(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
         EmployeeScheduleDatabase employeeScheduleDatabase = EmployeeScheduleDatabase.getInstance();
         InvitationStatusDatabase invitationStatusDatabase = InvitationStatusDatabase.getInstance();
         List<Employee> attendees = invitationStatusDatabase.getAttendees(oldMeeting);
@@ -159,7 +164,29 @@ public class MeetingControl {
     
     public static SortedSet<TimeSlot> getCoincidingEmployeeTimes(double meetingDurationInHours, Employee... invitees) throws SQLException {
         TreeSet<TimeSlot> schedule = getCombinedSchedule(invitees);
-        return getAvailableTimes(schedule, meetingDurationInHours);
+        Set<Room> rooms = getRoomsWithCapacity(invitees.length);
+        
+        if(rooms.isEmpty())
+            return new TreeSet<>();
+        
+        SortedSet<TimeSlot> times = getAvailableTimes(allTimesAfterNow(schedule), meetingDurationInHours);
+        for(TimeSlot time : times) {
+            if(!atLeastOneRoomAvailable(time, rooms))
+                times.remove(time);
+        }
+        
+        return times;
+    }
+    
+    private static Set<Room> getRoomsWithCapacity(int cap) throws SQLException {
+        Set<Room> rooms = new HashSet<>(RoomDatabase.getInstance().getAllRooms());
+        
+        for(Room room : rooms) {
+            if(room.getCapacity() < cap)
+                rooms.remove(room);
+        }
+        
+        return rooms;
     }
     
     private static TreeSet<TimeSlot> getCombinedSchedule(Employee... invitees) throws SQLException {
@@ -173,15 +200,31 @@ public class MeetingControl {
         return combinedSchedule;
     }
     
+    public static boolean allAvailable(Set<Employee> emps, TimeSlot time) throws SQLException {
+        for(Employee emp : emps) {
+            Employee scheduleCheck = new Employee();
+            scheduleCheck.setSchedule(EmployeeScheduleDatabase.getInstance().getEmployeeSchedule(emp));
+            if (!scheduleCheck.isAvailable(time))
+                return false;
+        }
+        return true;
+    }
+    
     public static Set<Room> getAvailableRooms(TimeSlot time, int capacity) throws SQLException {
         Set<Room> rooms = new HashSet<>(RoomDatabase.getInstance().getAllRooms());
         
         for(Room room : rooms) {
-            if (room.getCapacity() < capacity || !room.isAvailable(time))
+            Room scheduleCheck = new Room();
+            scheduleCheck.setSchedule(RoomScheduleDatabase.getInstance().getRoomSchedule(room));
+            if (room.getCapacity() < capacity || !scheduleCheck.isAvailable(time))
                 rooms.remove(room);
         }
         
         return rooms;
+    }
+    
+    public static List<TimeSlot> getRoomSchedule(Room room) throws SQLException {
+        return RoomScheduleDatabase.getInstance().getRoomSchedule(room);
     }
     
     private static SortedSet<TimeSlot> getAvailableRoomTimes(Room room, TreeSet<TimeSlot> inviteeSchedules, double meetingDurationInHours) throws SQLException {
@@ -208,11 +251,11 @@ public class MeetingControl {
             long timeBetweenEvents = elapsedTime(previous.getEndTime(), next.getStartTime());
             Date startTime = previous.getEndTime();
             
-            while(timeBetweenEvents >= meetingDurationInMilliseconds && availableTimes.size() < MAX_TIME_PER_ROOM) { 
+            while(timeBetweenEvents >= meetingDurationInMilliseconds && availableTimes.size() < MAX_TIME_PER_ROOM) {
                 TimeSlot newAvailableMeetingTime = newAvailableTime(startTime, meetingDurationInMilliseconds);
                 availableTimes.add(newAvailableMeetingTime);
                 
-                timeBetweenEvents -= meetingDurationInHours;
+                timeBetweenEvents -= meetingDurationInMilliseconds;
                 startTime = newAvailableMeetingTime.getEndTime();
             }
             
@@ -229,6 +272,14 @@ public class MeetingControl {
         }        
         
         return availableTimes;
+    }
+    
+    private static boolean atLeastOneRoomAvailable(TimeSlot timeSlot, Set<Room> rooms) {
+        for(Room room : rooms) {
+            if(room.isAvailable(timeSlot))
+                return true;
+        }
+        return false;
     }
     
     private static TimeSlot timeSlotForCurrentInstant() {

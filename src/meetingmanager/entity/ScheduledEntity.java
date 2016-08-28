@@ -1,5 +1,6 @@
 package meetingmanager.entity;
 
+import java.util.Collection;
 import java.util.TreeSet;
 
 public abstract class ScheduledEntity {
@@ -13,6 +14,11 @@ public abstract class ScheduledEntity {
 	public void setSchedule(TreeSet<TimeSlot> schedule) {
 		this.schedule = schedule;
 	}
+        
+        public void setSchedule(Collection<TimeSlot> schedule) {
+            this.schedule = new TreeSet<>();
+            this.schedule.addAll(schedule);
+        }
 
 	public TreeSet<TimeSlot> getSchedule() {
 		return schedule;

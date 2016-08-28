@@ -39,8 +39,12 @@ public class SelectTimePage extends SelectAndSubmitPage {
         setColumnHeaders(HEADERS);
     }
     
+    public Employee getOwner() {
+        return parent.getOwner();
+    }
+    
     private void loadAndDisplayTimes() throws SQLException {
-        Set<TimeSlot> possibletimes = MeetingControl.getCoincidingEmployeeTimes(parent.getDuration(), parent.getSelectedEmployees());
+        Set<TimeSlot> possibletimes = MeetingControl.getCoincidingEmployeeTimes(parent.getDuration(), parent.getAllEmployees());
         times = new HashMap<>();
         int rowCount = 0;
         
@@ -77,10 +81,6 @@ public class SelectTimePage extends SelectAndSubmitPage {
     
     public void refreshMainPage() {
         parent.refreshMainPage();
-    }
-    
-    public Employee getOwner() {
-        return parent.getOwner();
     }
     
     @Override

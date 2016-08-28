@@ -13,11 +13,13 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Meeting;
+import meetingmanager.entity.TimeSlot;
 import meetingmanager.exception.EntityNotFoundException;
 import static meetingmanager.userinterface.UIUtils.*;
 
@@ -30,6 +32,7 @@ public class UpdateMeetingPage extends AddMeetingPage {
     private static final Comparator<Employee> EMPLOYEE_COMPARATOR;
     private Set<Employee> invited;
     private Meeting meeting;
+    private UpdateTimePage child;
     
     static {
         EMPLOYEE_COMPARATOR = new Comparator<Employee>() {
@@ -48,6 +51,16 @@ public class UpdateMeetingPage extends AddMeetingPage {
         clearSelected();
         clearBench();
         loadEmployees();
+    }
+    
+    public void handleUpdateFailure(JPanel aChild) {
+        aChild.setVisible(false);
+        showMessage("You do not have any rooms that can fit that many people. Lighten your load.");
+        this.setVisible(true);
+    }
+    
+    public void handleUpdateSuccess(JPanel aChild) {
+        ((EmployeePage) parent).handleUpdateSuccess(this);
     }
     
     private void loadInvited() {
@@ -75,19 +88,25 @@ public class UpdateMeetingPage extends AddMeetingPage {
     }
     
     @Override
-    protected void moveToNextWindow() {                                         
-        // AFTER USERS ARE SELECTED, MOVE TO NEXT WINDOW TO SELECT ROOM
+    protected void moveToNextWindow() {
         try {
             String[] employeeLogins = getSelectedEmployeeIds();
             Set<Employee> newInviteeList = new HashSet<>(MeetingControl.getEmployees(employeeLogins));
-            MeetingControl.updateInviteeList(invited, newInviteeList, meeting);
-            if(!changeTimeAndLocation(newInviteeList))
-                return;
             
-            UpdateMeetingPage2 nextPage = new UpdateMeetingPage2(employeeLogins, this, invited, newInviteeList, meeting);
-            nextPage.setGrandParent(parent);
-            
-            getMainWindow().add(nextPage);
+            if(newInviteeList.size() > meeting.getLocation().getCapacity()) {
+                parent.handleUpdateFailure(this, "Too many employees for current room, please update room first.");
+            } else if (!MeetingControl.allAvailable(newInviteeList, meeting)) {
+                Meeting newMeeting = new Meeting(meeting).setInvited(newInviteeList);
+                if(child == null) {
+                    child = new UpdateTimePage(this, meeting, newMeeting);
+                    SwingUtilities.getWindowAncestor(this).add(child);
+                    child.setVisible(true);
+                    this.setVisible(false);
+                }
+            } else {
+                MeetingControl.updateInviteeList(invited, newInviteeList, meeting);
+                parent.handleUpdateSuccess(this);
+            }
             this.setVisible(false);
         } catch (SQLException e) {
             showMessage("Database error while trying to get employee list.");
@@ -98,12 +117,11 @@ public class UpdateMeetingPage extends AddMeetingPage {
         }
     }
     
-    private boolean changeTimeAndLocation(Set<Employee> newInviteeList) {
-        if(MeetingControl.conflictsExist(newInviteeList, meeting)){
-            showMessage("One or more employees can't make the original meeting time. Please choose a new time");
-            return true;
+    private boolean allAvailable(Set<Employee> invitees, TimeSlot time) {
+        for(Employee emp : invitees) {
+            if (!emp.isAvailable(time))
+                return false;
         }
-        
-        return warn("Would you like to change the meeting time as well?");
+        return true;
     }
 }

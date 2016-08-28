@@ -49,6 +49,18 @@ public class UIUtils {
         return (DefaultTableModel) table.getModel();
     }
     
+    public static String showOptionDialog(String title, String message, String[] options) {
+        return (String) JOptionPane.showInputDialog(
+                null,
+                message,
+                title,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+    }
+    
     public static int getRowWithValueInColumn(JTable table, String value, int column) {
         for(int i = 0; i < table.getRowCount(); i++) {
             String rowValue = (String) table.getValueAt(i, column);

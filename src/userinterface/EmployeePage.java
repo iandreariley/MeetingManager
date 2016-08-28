@@ -5,6 +5,7 @@
  */
 package userinterface;
 
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.control.MeetingControl;
@@ -25,7 +27,11 @@ import static meetingmanager.userinterface.UIUtils.*;
  * @author Matthew
  */
 public class EmployeePage extends javax.swing.JPanel {
-    
+
+    private final static String INVITE = "Invite / Uninvite";
+    private final static String LOCATION = "Change Location";
+    private final static String TIME = "Change Time";    
+    private final static String[] UPDATE_OPTIONS = new String[] { INVITE, LOCATION, TIME };
     /**
      * Creates new form EmployeePage
      */
@@ -102,6 +108,27 @@ public class EmployeePage extends javax.swing.JPanel {
     
     public void addEvent(TimeSlot event) {
             addRow(jTable3, vectorizeSchedule(event));
+    }
+    
+    public void destroy(JFrame frame) {
+        frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+    }
+    
+    private void destroy(JPanel panel) {        
+        JFrame updateFrame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+        destroy(updateFrame);
+    }
+    
+    public void handleUpdateFailure(JPanel panel, String message) {
+        showMessage(message);
+        destroy(panel);
+    }
+    
+    public void handleUpdateSuccess(JPanel panel) {
+        showMessage("Meeting updated!");
+        destroy(panel);
+        refreshMeetings();
+        refreshSchedule();
     }
 
     private Object[] vectorizeSchedule(TimeSlot schedule) {
@@ -426,13 +453,78 @@ public class EmployeePage extends javax.swing.JPanel {
         // UPDATE MEETING BUTTON
         if(jTable1.getSelectedRow() < 0)
             return;
-        JFrame newFrame = new JFrame("Update Meeting");
-            newFrame.add(new UpdateMeetingPage(rowMap.get(jTable1.getSelectedRow()), this));
-            newFrame.pack();
-            newFrame.setVisible(true);
         
+        switch(getUpdateMeetingOption()) {
+            case INVITE:
+                updateInvitees();
+                break;
+            case TIME:
+                updateTime();
+                break;
+            case LOCATION:
+                updateRoom();
+                break;
+            default:
+                showMessage("Somehow, that is not a valid option.");
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void updateInvitees() {
+        newFrame("Update Meeting", new UpdateMeetingPage(rowMap.get(jTable1.getSelectedRow()), this));
+    }
+    
+    private void updateTime() {
+        try {
+            Meeting oldMeeting = getFullMeeting();
+            Meeting newMeeting = new Meeting(oldMeeting);
+            UpdateTimePage page = new UpdateTimePage(this, newMeeting, oldMeeting);
+            newFrame("Update Meeting", page);            
+            page.setVisible(true);
+        } catch (SQLException e) {
+            showMessage("SQL error while trying to retrieve meeting information.");
+            e.printStackTrace();
+        }
+        
+    }
+    
+    private void updateRoom() {
+        try {
+            Meeting oldMeeting = getFullMeeting();
+            Meeting newMeeting = new Meeting(oldMeeting);
+            UpdateRoomPage page = new UpdateRoomPage(this, newMeeting, oldMeeting);
+            newFrame("Update Meeting", page);            
+            page.setVisible(true);
+        } catch (SQLException e) {
+            showMessage("SQL error while trying to retrieve meeting information.");
+            e.printStackTrace();
+        }
+    }
+    
+    public Meeting getFullMeeting() throws SQLException {
+        Meeting meeting = rowMap.get(jTable1.getSelectedRow());
+        meeting.setInvited(MeetingControl.getInvited(meeting));
+        return meeting;
+    }
+    
+    public Meeting getSelectedMeeting() {
+        return rowMap.get(jTable1.getSelectedRow());
+    }
+    
+    private JFrame newFrame(String title, JPanel initialPage) {        
+        JFrame newFrame = new JFrame(title);
+            newFrame.add(initialPage);
+            newFrame.pack();
+            newFrame.setVisible(true);
+        return newFrame;
+    }
+    
+    private String getUpdateMeetingOption() {
+        return showOptionDialog(
+                "Update Wizard",
+                "What would you like to do?",
+                UPDATE_OPTIONS);
+    }
+    
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // DELETE MEETING
         if (jTable1.getSelectedRow() < 0)

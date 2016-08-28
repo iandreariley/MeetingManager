@@ -277,6 +277,19 @@ public class AddMeetingPage extends javax.swing.JPanel {
         }
         
         return selected;
+    }                                     
+
+    public Employee[] getAllEmployees() {
+        String[] selectedIds = getSelectedEmployeeIds();
+        Employee[] selected = new Employee[selectedIds.length + 1];
+        
+        for(int i = 0; i < selectedIds.length; i++) {
+            selected[i] = employeeMap.get(selectedIds[i]);
+        }
+        
+        selected[selectedIds.length] = owner;
+        
+        return selected;
     }
     protected void moveToNextWindow() {
         if (noDuration() || noTitle()) {

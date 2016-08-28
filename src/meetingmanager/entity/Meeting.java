@@ -27,10 +27,10 @@ public class Meeting extends TimeSlot {
 	
         public Meeting(Meeting otherMeeting) {
             super(otherMeeting);
-            this.attending = attending;
-            this.invited = invited;
-            this.owner = owner;
-            this.location = location;
+            this.attending = setCopy(otherMeeting.attending);
+            this.invited = setCopy(otherMeeting.invited);
+            this.owner = otherMeeting.owner;
+            this.location = otherMeeting.location;
         }
         
 	public Meeting() {
@@ -71,6 +71,11 @@ public class Meeting extends TimeSlot {
 	public SortedSet<Employee> getInvited() {
 		return invited;
 	}
+        
+        public void setTime(TimeSlot time) {
+            setStartTime(time.getStartTime());
+            setEndTime(time.getEndTime());
+        }
 	
 	public Meeting setInvited(SortedSet<Employee> invited) {
 		this.invited = invited;
@@ -121,5 +126,15 @@ public class Meeting extends TimeSlot {
         } else { // check whether it is a timeslot
             return super.equals(obj);
         }
+    }
+    
+    private SortedSet<Employee> setCopy(SortedSet<Employee> employees) {
+        if(employees == null)
+            return null;
+        
+        TreeSet<Employee> copy = new TreeSet<>(ALPHA_EMPLOYEE_SORTER);
+        copy.addAll(employees);
+        
+        return copy;
     }
 }
