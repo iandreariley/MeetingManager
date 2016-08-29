@@ -6,6 +6,7 @@
 package userinterface;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import static meetingmanager.userinterface.UIUtils.addRow;
 import static meetingmanager.userinterface.UIUtils.clearTable;
@@ -163,5 +164,11 @@ public class SelectAndSubmitPage extends javax.swing.JPanel {
     
     protected final void clearMainTable() {
         clearTable(jTable1);
+    }
+    
+    public void returnControl(JPanel aChild) {
+        aChild.setVisible(false);
+        getWindowAncestor().remove(aChild);
+        this.setVisible(true);
     }
 }

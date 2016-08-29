@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import meetingmanager.control.EmployeeControl;
 import meetingmanager.entity.Employee;
@@ -91,6 +92,15 @@ public class AddMeetingPage extends javax.swing.JPanel {
         } catch (NumberFormatException e) {
             return -1;
         }
+    }
+    
+    public void returnControl(JPanel aChild) {
+        getWindowAncestor(aChild).remove(aChild);
+        this.setVisible(true);
+    }
+    
+    private JFrame getWindowAncestor(JPanel component) {
+        return (JFrame) SwingUtilities.getWindowAncestor(component);
     }
     
     private void loadEmployees() {
@@ -307,7 +317,7 @@ public class AddMeetingPage extends javax.swing.JPanel {
     }
     
     public int getHeadCount() {
-        return jTable2.getRowCount();
+        return jTable2.getRowCount() + 1; // plus 1 for owner.
     }
     
     private boolean noTitle() {

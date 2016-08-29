@@ -85,6 +85,7 @@ public class EmployeeScheduleDatabase extends TimeSlotDatabase {
                 + keyValue(EMPLOYEE, employee.getLoginId())
             );
         }
+        
 	@Override
 	protected void checkPrimaryKey(TimeSlot obj)
 			throws MissingPrimaryKeyException {

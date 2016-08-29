@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.Set;
 import meetingmanager.entity.Employee;
@@ -54,8 +55,21 @@ public class MeetingControl {
     }
     
     public static SortedSet<Meeting> getOwnedMeetings(Employee owner) throws SQLException {
-        return new TreeSet<>(MeetingDatabase.getInstance().getOwnedMeetings(owner));
-    } 
+        TreeSet<Meeting> meetings = new TreeSet<>(MeetingDatabase.getInstance().getOwnedMeetings(owner));
+        return allMeetingsAfterNow(meetings);
+    }
+    
+    private static TreeSet<Meeting> allMeetingsAfterNow(TreeSet<Meeting> meetings) {
+        Date now = now();
+        TreeSet<Meeting> relevent = new TreeSet<>();
+        for(Meeting meeting : meetings.descendingSet()) {
+            if(meeting.getEndTime().after(now))
+                relevent.add(meeting);
+            else
+                break;
+        }
+        return relevent;
+    }
     
     public static List<Employee> getInvited(Meeting meeting) throws SQLException {
         return InvitationStatusDatabase.getInstance().getInvitees(meeting);
@@ -180,10 +194,11 @@ public class MeetingControl {
     
     private static Set<Room> getRoomsWithCapacity(int cap) throws SQLException {
         Set<Room> rooms = new HashSet<>(RoomDatabase.getInstance().getAllRooms());
+        Set<Room> edited = new HashSet<>();
         
         for(Room room : rooms) {
-            if(room.getCapacity() < cap)
-                rooms.remove(room);
+            if(room.getCapacity() >= cap)
+                edited.add(room);
         }
         
         return rooms;
@@ -212,15 +227,16 @@ public class MeetingControl {
     
     public static Set<Room> getAvailableRooms(TimeSlot time, int capacity) throws SQLException {
         Set<Room> rooms = new HashSet<>(RoomDatabase.getInstance().getAllRooms());
+        Set<Room> edited = new HashSet<>();
         
         for(Room room : rooms) {
             Room scheduleCheck = new Room();
             scheduleCheck.setSchedule(RoomScheduleDatabase.getInstance().getRoomSchedule(room));
-            if (room.getCapacity() < capacity || !scheduleCheck.isAvailable(time))
-                rooms.remove(room);
+            if (room.getCapacity() >= capacity && scheduleCheck.isAvailable(time))
+                edited.add(room);
         }
         
-        return rooms;
+        return edited;
     }
     
     public static List<TimeSlot> getRoomSchedule(Room room) throws SQLException {
@@ -287,11 +303,22 @@ public class MeetingControl {
     }
     
     private static NavigableSet<TimeSlot> allTimesAfterNow(TreeSet<TimeSlot> schedule) {
-        TimeSlot start = schedule.ceiling(timeSlotForCurrentInstant());
+        TimeSlot currentScheduleItem = getCurrentScheduleItem(schedule);
+        TimeSlot nextScheduleItem = schedule.ceiling(timeSlotForCurrentInstant());
+        TimeSlot start = currentScheduleItem == null ? nextScheduleItem : currentScheduleItem;
         if(start == null)
             return new TreeSet<>();
         else
-            return schedule.subSet(schedule.ceiling(timeSlotForCurrentInstant()), true, schedule.last(), true);
+            return schedule.subSet(start, true, schedule.last(), true);
+    }
+    
+    private static TimeSlot getCurrentScheduleItem(TreeSet<TimeSlot> schedule) {
+        TimeSlot now = timeSlotForCurrentInstant();
+        TimeSlot current = schedule.floor(now);
+        if (current == null || current.getEndTime().before(now.getStartTime()))
+            return null;
+        else
+            return current;
     }
     
     private static TimeSlot newAvailableTime(Date startTime, long durationInMilliseconds) {

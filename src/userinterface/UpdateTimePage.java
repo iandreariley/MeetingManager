@@ -6,7 +6,6 @@
 package userinterface;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +17,6 @@ import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
 import static meetingmanager.userinterface.UIUtils.showMessage;
-import static userinterface.SelectTimePage.HEADERS;
 
 /**
  *
@@ -27,6 +25,7 @@ import static userinterface.SelectTimePage.HEADERS;
 public class UpdateTimePage extends SelectAndSubmitPage {
     
     public static final String[] HEADERS = { "Start Time", "End Time" };
+    private static final double HOURS_IN_MILLISECONDS = 3600000;
     
     private JPanel parent;
     private UpdateRoomPage child;
@@ -40,7 +39,7 @@ public class UpdateTimePage extends SelectAndSubmitPage {
         this.oldMeeting = oldMeeting;
         this.newMeeting = newMeeting;
         setHeaders();
-        setSubmitButtonText("Choose Room ->");
+        setSubmitButtonText("Submit");
         clearMainTable();
         loadAndDisplayTimes();
     }
@@ -50,7 +49,7 @@ public class UpdateTimePage extends SelectAndSubmitPage {
     }
     
     private void loadAndDisplayTimes() throws SQLException {
-        double hours = (double) oldMeeting.getDuration() / (double) 3600000;
+        double hours = (double) oldMeeting.getDuration() / (double) HOURS_IN_MILLISECONDS;
         Set<TimeSlot> possibleTimes = MeetingControl.getCoincidingEmployeeTimes(hours, toArray(newMeeting.getInvited()));
         if (possibleTimes.isEmpty())
             handleFailure();
@@ -100,12 +99,14 @@ public class UpdateTimePage extends SelectAndSubmitPage {
             Room currentRoom = oldMeeting.getLocation();
             currentRoom.setSchedule(new TreeSet<>(MeetingControl.getRoomSchedule(currentRoom)));
             newMeeting.setTime(newTime);
-            if(currentRoom.isAvailable(newTime)) {
+            if(currentRoom.isAvailable(newTime) && currentRoom.getCapacity() >= newMeeting.size()) {                
                 MeetingControl.updateMeetingTime(oldMeeting, newMeeting);
                 handleSuccess(this);
             } else {
                 if (child == null)
                     child = new UpdateRoomPage(this, oldMeeting, newMeeting);
+                showMessage("The room you're meeting in isn't available at that time, or doesn't have the capacity for all your invitees. Please choose a new time");
+                getWindowAncestor().add(child);
                 child.setVisible(true);
                 this.setVisible(false);
             }
@@ -120,5 +121,19 @@ public class UpdateTimePage extends SelectAndSubmitPage {
         } else if (parent instanceof UpdateMeetingPage) {
             ((UpdateMeetingPage) parent).handleUpdateSuccess(this);
         }
+    }
+    
+    @Override
+    protected void backButtonAction() {
+        if (parent instanceof EmployeePage) {
+            ((EmployeePage) parent).returnControl(this);
+        } else if (parent instanceof UpdateMeetingPage) {
+            ((UpdateMeetingPage) parent).returnControl(this);
+        }
+    }
+    
+    public void returnControl() {
+        getWindowAncestor().remove(child);
+        this.setVisible(true);
     }
 }

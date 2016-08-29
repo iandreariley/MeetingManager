@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JPanel;
 import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.TimeSlot;
@@ -84,6 +85,13 @@ public class SelectTimePage extends SelectAndSubmitPage {
     }
     
     @Override
+    public void returnControl(JPanel aChild) {
+        super.returnControl(aChild);
+        if (child == aChild)
+            child =null;
+    }
+    
+    @Override
     public void submitButtonAction() {
         if(nothingSelected()) {
             showMessage("Please select a time first.");
@@ -103,7 +111,6 @@ public class SelectTimePage extends SelectAndSubmitPage {
     
     @Override
     public void backButtonAction() {
-        this.setVisible(false);
-        parent.setVisible(true);
+        parent.returnControl(this);
     }
 }

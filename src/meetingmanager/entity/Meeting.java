@@ -58,6 +58,12 @@ public class Meeting extends TimeSlot {
 			throw new InviteeNotFoundException();
 		}
 	}
+        
+        public int size() {
+            if(invited == null)
+                return 1;
+            return invited.size() + 1;
+        }
 	
 	public Room getLocation() {
 		return location;

@@ -173,7 +173,7 @@ public class AddSchedulePage extends javax.swing.JPanel {
         
         
             if(EmployeeControl.addEvent(emp, newEvent)) {
-                parent.addEvent(newEvent);
+                parent.refreshSchedule();
                 showMessage("Event on " + newEvent.getStartTime() + " to "+ newEvent.getEndTime() + " added.");
             } else {
                 showMessage("That event has a conflict! Please reschedule.");

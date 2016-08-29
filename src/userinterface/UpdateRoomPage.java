@@ -27,7 +27,7 @@ public class UpdateRoomPage extends SelectAndSubmitPage {
     private Meeting newMeeting;
     private Meeting oldMeeting;
     
-    public UpdateRoomPage(JPanel parent, Meeting newMeeting, Meeting oldMeeting) throws SQLException {
+    public UpdateRoomPage(JPanel parent, Meeting oldMeeting, Meeting newMeeting) throws SQLException {
         super();
         this.newMeeting = newMeeting;
         this.oldMeeting = oldMeeting;
@@ -66,7 +66,7 @@ public class UpdateRoomPage extends SelectAndSubmitPage {
         try {            
             newMeeting.setLocation(rooms.get(getSelectedRow()));
             MeetingControl.updateMeeting(oldMeeting, newMeeting);
-            ((EmployeePage)parent).handleUpdateSuccess(this);
+            handleSuccess();
         } catch (SQLException e) {
             showMessage("SQL error while trying to update meeting.");
             e.printStackTrace();
@@ -74,11 +74,24 @@ public class UpdateRoomPage extends SelectAndSubmitPage {
         
     }
     
+    @Override
+    protected void backButtonAction() {
+        if (parent instanceof EmployeePage) {
+            ((EmployeePage) parent).returnControl(this);
+        } else if (parent instanceof UpdateTimePage) {
+            ((UpdateTimePage) parent).returnControl(this);
+        } else if (parent instanceof UpdateMeetingPage) {
+            ((UpdateMeetingPage) parent).returnControl(this);
+        }
+    }
+    
     private void handleSuccess() {
         if (parent instanceof EmployeePage) {
             ((EmployeePage) parent).handleUpdateSuccess(this);
         } else if (parent instanceof UpdateTimePage) {
             ((UpdateTimePage) parent).handleSuccess(this);
+        } else if (parent instanceof UpdateMeetingPage) {
+            ((UpdateMeetingPage) parent).handleUpdateSuccess(this);
         }
     }
     
@@ -88,7 +101,7 @@ public class UpdateRoomPage extends SelectAndSubmitPage {
     }
     
     private Set<Room> getAvailableRooms() throws SQLException {
-        return MeetingControl.getAvailableRooms(newMeeting, newMeeting.getInvited().size()); 
+        return MeetingControl.getAvailableRooms(newMeeting, newMeeting.size()); 
     }
     
     private Object[] vectorizeRoom(Room room) {

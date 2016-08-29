@@ -72,7 +72,6 @@ public class SelectRoomPage extends SelectAndSubmitPage {
     
     @Override
     protected void backButtonAction() {
-        this.setVisible(false);
-        parent.setVisible(true);
+        parent.returnControl(this);
     }
 }

@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,6 +23,7 @@ import meetingmanager.entity.Employee;
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.TimeSlot;
 import static meetingmanager.userinterface.UIUtils.*;
+import static meetingmanager.utils.Utils.now;
 /**
  *
  * @author Matthew
@@ -32,6 +34,7 @@ public class EmployeePage extends javax.swing.JPanel {
     private final static String LOCATION = "Change Location";
     private final static String TIME = "Change Time";    
     private final static String[] UPDATE_OPTIONS = new String[] { INVITE, LOCATION, TIME };
+    private final static int SCHEDULE_DAYS = 2;
     /**
      * Creates new form EmployeePage
      */
@@ -90,10 +93,10 @@ public class EmployeePage extends javax.swing.JPanel {
     
     private void loadSchedule() {
         try {
-            List<TimeSlot> schedule = EmployeeControl.getEmployeeSchedule(emp);
+            TreeSet<TimeSlot> schedule = EmployeeControl.getPartialSchedule(emp, SCHEDULE_DAYS);
             
-            for(int i = 0; i < schedule.size(); i++) {
-                Object[] row = vectorizeSchedule(schedule.get(i));
+            for(TimeSlot time : schedule) {
+                Object[] row = vectorizeSchedule(time);
                 addRow(jTable3, row);
             }
         } catch (SQLException e) {
@@ -546,7 +549,10 @@ public class EmployeePage extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
-
+    public void returnControl(JPanel aChild) {
+        aChild.setVisible(false);
+        destroy(aChild); // sad
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton11;

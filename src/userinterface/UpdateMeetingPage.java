@@ -19,6 +19,7 @@ import meetingmanager.control.EmployeeControl;
 import meetingmanager.control.MeetingControl;
 import meetingmanager.entity.Employee;
 import meetingmanager.entity.Meeting;
+import meetingmanager.entity.Room;
 import meetingmanager.entity.TimeSlot;
 import meetingmanager.exception.EntityNotFoundException;
 import static meetingmanager.userinterface.UIUtils.*;
@@ -32,7 +33,7 @@ public class UpdateMeetingPage extends AddMeetingPage {
     private static final Comparator<Employee> EMPLOYEE_COMPARATOR;
     private Set<Employee> invited;
     private Meeting meeting;
-    private UpdateTimePage child;
+    private JPanel child;
     
     static {
         EMPLOYEE_COMPARATOR = new Comparator<Employee>() {
@@ -92,16 +93,23 @@ public class UpdateMeetingPage extends AddMeetingPage {
         try {
             String[] employeeLogins = getSelectedEmployeeIds();
             Set<Employee> newInviteeList = new HashSet<>(MeetingControl.getEmployees(employeeLogins));
+            Meeting newMeeting = new Meeting(meeting).setInvited(newInviteeList);
             
-            if(newInviteeList.size() > meeting.getLocation().getCapacity()) {
-                parent.handleUpdateFailure(this, "Too many employees for current room, please update room first.");
+            if(newMeeting.size() > meeting.getLocation().getCapacity()) {
+                Set<Room> otherRooms = MeetingControl.getAvailableRooms(newMeeting, newMeeting.size());
+                if(otherRooms.isEmpty()) {
+                    showMessage("Too many employees for current room, and no alternates at this time.\nPlease choose a new meeting time");
+                    child = new UpdateTimePage(this, meeting, newMeeting);
+                    showChild();
+                } else {
+                    showMessage("Too many employees for current room, please update room first.");
+                    child = new UpdateRoomPage(this, meeting, newMeeting);
+                    showChild();
+                }
             } else if (!MeetingControl.allAvailable(newInviteeList, meeting)) {
-                Meeting newMeeting = new Meeting(meeting).setInvited(newInviteeList);
                 if(child == null) {
                     child = new UpdateTimePage(this, meeting, newMeeting);
-                    SwingUtilities.getWindowAncestor(this).add(child);
-                    child.setVisible(true);
-                    this.setVisible(false);
+                    showChild();
                 }
             } else {
                 MeetingControl.updateInviteeList(invited, newInviteeList, meeting);
@@ -115,6 +123,13 @@ public class UpdateMeetingPage extends AddMeetingPage {
             showMessage("Couldn't find employee in database.");
             e.printStackTrace();
         }
+    }
+    
+    private void showChild() {
+        SwingUtilities.getWindowAncestor(this).add(child);
+        child.setVisible(true);
+        this.setVisible(false);
+        
     }
     
     private boolean allAvailable(Set<Employee> invitees, TimeSlot time) {

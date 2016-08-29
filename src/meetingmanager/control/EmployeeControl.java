@@ -51,10 +51,11 @@ public class EmployeeControl {
     public static TreeSet<TimeSlot> getPartialSchedule(Employee employee, int days) throws SQLException {
         List<TimeSlot> fullSchedule = EmployeeScheduleDatabase.getInstance().getEmployeeSchedule(employee);
         TreeSet<TimeSlot> partialSchedule = new TreeSet<>();
-        Date cutoff = timeAfterInterval(now(), days * DAY_IN_MILLISECONDS);
+        Date start = now();
+        Date cutoff = timeAfterInterval(start, days * DAY_IN_MILLISECONDS);
         
         for(TimeSlot scheduleItem : fullSchedule) {
-            if(scheduleItem.getStartTime().before(cutoff))
+            if(scheduleItem.getStartTime().before(cutoff) && scheduleItem.getEndTime().after(start))
                 partialSchedule.add(scheduleItem);
         }
         

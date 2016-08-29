@@ -165,7 +165,7 @@ public class UpdateEmployeeSched extends javax.swing.JPanel {
         
         
             EmployeeControl.addEvent(emp, newEvent);
-            parent.addEvent(newEvent);
+            parent.refreshSchedule();
             EmployeeControl.removeEvent(emp, timeS);
             deleteRow(jtable, row);
             
