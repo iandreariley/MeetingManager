@@ -95,7 +95,13 @@ public class UpdateMeetingPage extends AddMeetingPage {
             Set<Employee> newInviteeList = new HashSet<>(MeetingControl.getEmployees(employeeLogins));
             Meeting newMeeting = new Meeting(meeting).setInvited(newInviteeList);
             
-            if(newMeeting.size() > meeting.getLocation().getCapacity()) {
+            if (!MeetingControl.allAvailable(newInviteeList, meeting)) {
+                showMessage("Not all invitees are available at the currrent time. Please select a new time.");
+                if(child == null) {
+                    child = new UpdateTimePage(this, meeting, newMeeting);
+                    showChild();
+                }
+            } else if(newMeeting.size() > meeting.getLocation().getCapacity()) {
                 Set<Room> otherRooms = MeetingControl.getAvailableRooms(newMeeting, newMeeting.size());
                 if(otherRooms.isEmpty()) {
                     showMessage("Too many employees for current room, and no alternates at this time.\nPlease choose a new meeting time");
@@ -106,12 +112,7 @@ public class UpdateMeetingPage extends AddMeetingPage {
                     child = new UpdateRoomPage(this, meeting, newMeeting);
                     showChild();
                 }
-            } else if (!MeetingControl.allAvailable(newInviteeList, meeting)) {
-                if(child == null) {
-                    child = new UpdateTimePage(this, meeting, newMeeting);
-                    showChild();
-                }
-            } else {
+            }  else {
                 MeetingControl.updateInviteeList(invited, newInviteeList, meeting);
                 parent.handleUpdateSuccess(this);
             }

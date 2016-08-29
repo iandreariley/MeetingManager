@@ -97,6 +97,9 @@ public class MeetingControl {
     public static void updateMeeting(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
         updateMeetingTime(oldMeeting, newMeeting);
         MeetingDatabase.getInstance().updateLocation(newMeeting);
+        RoomScheduleDatabase roomScheduler = RoomScheduleDatabase.getInstance();
+        roomScheduler.deleteRoomScheduleItem(oldMeeting.getLocation(), oldMeeting);
+        roomScheduler.addRoomScheduleItem(newMeeting.getLocation(), newMeeting);
     }
     
     public static void updateMeetingTime(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
