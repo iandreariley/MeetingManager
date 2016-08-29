@@ -98,7 +98,7 @@ public class UpdateMeetingPage extends AddMeetingPage {
             if (!MeetingControl.allAvailable(newInviteeList, meeting)) {
                 showMessage("Not all invitees are available at the currrent time. Please select a new time.");
                 if(child == null) {
-                    child = new UpdateTimePage(this, meeting, newMeeting);
+                    child = new UpdateTimePage(this, parent.getFullMeeting(), newMeeting);
                     showChild();
                 }
             } else if(newMeeting.size() > meeting.getLocation().getCapacity()) {

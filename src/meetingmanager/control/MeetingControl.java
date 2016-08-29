@@ -95,14 +95,25 @@ public class MeetingControl {
     }
     
     public static void updateMeeting(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
+        updateInviteeList(oldMeeting.getInvited(), newMeeting.getInvited(), oldMeeting);
+        updateMeetingLocation(oldMeeting, newMeeting);
         updateMeetingTime(oldMeeting, newMeeting);
-        MeetingDatabase.getInstance().updateLocation(newMeeting);
+    }
+    
+    public static void updateMeetingLocation(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
+        if(oldMeeting.getLocation().getLocation().equals(newMeeting.getLocation().getLocation()))
+            return;
+        
         RoomScheduleDatabase roomScheduler = RoomScheduleDatabase.getInstance();
         roomScheduler.deleteRoomScheduleItem(oldMeeting.getLocation(), oldMeeting);
         roomScheduler.addRoomScheduleItem(newMeeting.getLocation(), newMeeting);
+        MeetingDatabase.getInstance().updateLocation(oldMeeting, newMeeting.getLocation());
     }
     
     public static void updateMeetingTime(Meeting oldMeeting, Meeting newMeeting) throws SQLException {
+        if(new TimeSlot(oldMeeting).equals(new TimeSlot(newMeeting)))
+            return;
+        
         EmployeeScheduleDatabase employeeScheduleDatabase = EmployeeScheduleDatabase.getInstance();
         InvitationStatusDatabase invitationStatusDatabase = InvitationStatusDatabase.getInstance();
         List<Employee> attendees = invitationStatusDatabase.getAttendees(oldMeeting);
@@ -120,13 +131,21 @@ public class MeetingControl {
     public static void updateInviteeList(Set<Employee> original, Set<Employee> newList, Meeting meeting) throws SQLException {
         Set<Employee> removed = setDifference(original, newList);
         Set<Employee> added = setDifference(newList, original);
-        handleRemoval(removed, meeting);
-        invite(added, meeting, false);
+        
+        if(!removed.isEmpty())
+            handleRemoval(removed, meeting);
+        if(!added.isEmpty())
+            invite(added, meeting, false);
     }
     
     private static void handleRemoval(Set<Employee> toRemove, Meeting meeting) throws SQLException {
+        List<Employee> attending = InvitationStatusDatabase.getInstance().getAttendees(meeting);
         for (Employee removed : toRemove) {
+            InvitationStatusDatabase.getInstance().deleteInvitationTime(meeting, removed);
             NotificationDatabase.getInstance().addNotification(removalNotification(removed, meeting));
+            if(attending.contains(removed)) {
+                EmployeeScheduleDatabase.getInstance().deleteEmployeeScheduleItem(removed, meeting);
+            }
         }
     }
     
@@ -148,9 +167,14 @@ public class MeetingControl {
         return EmployeeDatabase.getInstance().getEmployeeList(loginIds);
     }
     
-    public static void acceptInvitation(Meeting meeting, Employee invitee) throws InviteeNotFoundException, SQLException {
+    public static boolean acceptInvitation(Meeting meeting, Employee invitee) throws InviteeNotFoundException, SQLException {
+        invitee.setSchedule(EmployeeScheduleDatabase.getInstance().getEmployeeSchedule(invitee));
+        if(!invitee.isAvailable(meeting))
+            return false;
+        
         EmployeeScheduleDatabase.getInstance().addEmployeeScheduleItem(invitee, meeting);
         InvitationStatusDatabase.getInstance().updateInvitationStatus(invitee, meeting, true);
+        return true;
     }
     
     public static void declineInvitation(Meeting meeting, Employee invitee) throws SQLException {

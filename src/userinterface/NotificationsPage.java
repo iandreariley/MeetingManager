@@ -245,10 +245,13 @@ public class NotificationsPage extends javax.swing.JPanel{
         try {
             int row = jTable1.getSelectedRow();
             Meeting meeting = invitationRowMap.get(row);
-            MeetingControl.acceptInvitation(meeting, emp);
-            removeInvitation(row);
-            showMessage("Thank you! You are now attending " + meeting.getTitle());
-            parent.refreshSchedule();
+            if(MeetingControl.acceptInvitation(meeting, emp)) {
+                removeInvitation(row);
+                showMessage("Thank you! You are now attending " + meeting.getTitle());
+                parent.refreshSchedule();
+            } else {
+                showMessage("It looks like you have a conflict with this meeting.\nReview your schedule and either make room or decline the invitation.");
+            }
         } catch (SQLException e) {
             showMessage("Database error while trying to accept invitation.");
             e.printStackTrace();

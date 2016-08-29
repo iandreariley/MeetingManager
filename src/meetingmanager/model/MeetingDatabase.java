@@ -12,6 +12,7 @@ import java.util.Map;
 
 import meetingmanager.entity.Meeting;
 import meetingmanager.entity.Employee;
+import meetingmanager.entity.Room;
 import meetingmanager.exception.EntityNotFoundException;
 import meetingmanager.exception.MissingPrimaryKeyException;
 import static meetingmanager.model.DatabaseConnection.connect;
@@ -94,10 +95,10 @@ public class MeetingDatabase extends DatabaseConnection<Meeting> {
             );
         }
         
-        public void updateLocation(Meeting meeting) throws SQLException {
+        public void updateLocation(Meeting meeting, Room location) throws SQLException {
             updateDatabase(
                 "UPDATE meeting SET "
-                + keyValue(LOCATION, meeting.getLocation().getLocation()) + " "
+                + keyValue(LOCATION, location.getLocation()) + " "
                 + "WHERE "
                 + keyValue(OWNER, meeting.getOwner().getLoginId()) + AND
                 + keyValue(START_TIME, meeting.getStartTime()) + AND
